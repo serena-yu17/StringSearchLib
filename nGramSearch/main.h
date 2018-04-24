@@ -47,24 +47,28 @@ void toUpper(std::string& str)
 		ch = toupper(ch);
 }
 
+inline bool compareScores(const std::pair<const std::string*, float>& a, const std::pair<const std::string*, float>& b)
+{
+	if (a.second > b.second)
+		return true;
+	if (a.second < b.second)
+		return false;
+	return a.first < b.first;
+}
+
 namespace std {
-	template <>
-	struct hash<string*>
-	{
-		std::size_t operator()(string* k) const
-		{
-			return hash<string>()(*k);
+	class StringPointerHash {
+	public:
+		size_t operator() (const string *val) const {
+			return std::hash<std::string>()(*val);
+		}
+	};
+
+	class StringPointerEqual {
+	public:
+		bool operator()(const string *val1, const string *val2) const {
+			return *val1 == *val2;
 		}
 	};
 }
 
-namespace std {
-	template <>
-	struct hash<const string*>
-	{
-		std::size_t operator()(const string* k) const
-		{
-			return hash<string>()(*k);
-		}
-	};
-}
