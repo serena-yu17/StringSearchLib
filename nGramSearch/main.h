@@ -25,7 +25,7 @@ static inline void rtrim(std::string &s) {
 
 static inline void rtrimW(std::wstring &s) {
 	s.erase(std::find_if(s.rbegin(), s.rend(), [](wchar_t ch) {
-		return !std::isspace(ch);
+		return !std::iswspace(ch);
 	}).base(), s.end());
 }
 
