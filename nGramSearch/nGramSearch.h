@@ -1,6 +1,20 @@
 #pragma once
 
-#include "stdafx.h"
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+// Windows Header Files:
+#include <windows.h>
+
+#include <string>
+#include <unordered_map>
+#include <mutex>
+#include <cctype>
+#include <wchar.h>
+#include <cwctype>
+#include <unordered_set>
+#include <algorithm>
+#include <future>
+#include <intrin.h>
+#include <mutex>
 
 #define DLLEXP extern "C" __declspec(dllexport)
 
@@ -49,6 +63,7 @@ public:
 	typedef typename str_t::value_type char_t;
 
 	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t gSize);
+	StringIndex(char_t*** const key, const size_t size, const uint16_t gSize);
 
 	void getGrams(str_t* str);
 	void getGrams(const str_t& str, std::vector<str_t>& generatedGrams);
