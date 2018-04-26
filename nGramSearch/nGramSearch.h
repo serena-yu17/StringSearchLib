@@ -18,6 +18,7 @@
 #include <intrin.h>
 #include <shared_mutex>
 #include <memory>
+#include <mutex>
 
 #define DLLEXP extern "C" __declspec(dllexport)
 
@@ -91,9 +92,9 @@ public:
 	void getGrams(const char_t* str, const int size, std::vector<str_t>& generatedGrams);
 	void buildGrams();
 	int stringMatch(const str_t& query, const str_t& source);
-	void getMatchScore(const str_t& query, const str_t& source, std::unordered_map<str_t, float>& score);
-	void searchShort(str_t& query, std::unordered_map<str_t, float>& score);
-	void searchLong(str_t& query, std::unordered_map<str_t, float>& score);
+	void getMatchScore(const str_t& query, const str_t& source, std::unordered_map<str_t*, float>& score);
+	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);
+	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);
 	void insert(std::vector<str_t>& key, std::vector<str_t>* additional, const int16_t gSize);	
 	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
 	void search(const char_t* query, char_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
@@ -124,13 +125,13 @@ public:
 	}
 
 	template<class str_t>
-	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
+	static inline bool compareScores(std::pair<str_t*, float>& a, std::pair<str_t*, float>& b)
 	{
 		if (a.second > b.second)
 			return true;
 		if (a.second < b.second)
 			return false;
-		return a.first < b.first;
+		return *(a.first) < *(b.first);
 	}
 
 	// trim from both ends (in place)
@@ -143,18 +144,14 @@ public:
 protected:
 	std::vector<str_t> longLib;
 	std::vector<str_t> shortLib;
-	std::unordered_map<const str_t*, str_t> wordMap;
+	std::unordered_map<str_t*, str_t> wordMap;
 	std::unordered_map<str_t, std::vector<const str_t*>> ngrams;
 	int16_t gramSize = 3;
 
 private:	
 
-	std::shared_mutex mutScore;
+	std::mutex mutScore;
 };
-
-
-DLLEXP void index(char* const guid, char** const key, const size_t size,
-	char** const additional = NULL, const uint16_t gSize = 3, int* weight = NULL);
 
 
 #endif
