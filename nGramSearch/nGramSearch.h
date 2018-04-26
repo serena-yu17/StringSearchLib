@@ -1,4 +1,6 @@
 #pragma once
+#ifndef NGRAMSEARCH_H
+#define NGRAMSEARCH_H
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
@@ -14,7 +16,8 @@
 #include <algorithm>
 #include <future>
 #include <intrin.h>
-#include <mutex>
+#include <shared_mutex>
+#include <memory>
 
 #define DLLEXP extern "C" __declspec(dllexport)
 
@@ -62,40 +65,66 @@ class StringIndex
 public:
 	typedef typename str_t::value_type char_t;
 
-	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t gSize);
-	StringIndex(char_t*** const key, const size_t size, const uint16_t gSize);
+	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t gSize, int* weight = NULL);
+	StringIndex(char_t*** const key, const size_t size, const uint16_t gSize, int* weight = NULL);
+
+	StringIndex(const StringIndex<str_t>& other)
+	{
+		std::copy(other.longLib.begin(), other.longLib.end(), longLib);
+		std::copy(other.shortLib.begin(), other.shortLib.end(), shortLib);
+		std::copy(other.wordMap.begin(), other.wordMap.end(), wordMap);
+		std::copy(other.ngrams.begin(), other.ngrams.end(), ngrams);
+		gramSize = other.gramSize;
+	}
+
+	StringIndex(StringIndex<str_t>&& other)
+	{
+		longLib = other.longLib;
+		shortLib = other.shortLib;
+		wordMap = other.wordMap;
+		ngrams = other.ngrams;
+		gramSize = other.gramSize;
+	}
 
 	void getGrams(str_t* str);
 	void getGrams(const str_t& str, std::vector<str_t>& generatedGrams);
 	void getGrams(const char_t* str, const int size, std::vector<str_t>& generatedGrams);
 	void buildGrams();
 	int stringMatch(const str_t& query, const str_t& source);
-	std::pair<str_t*, int> getMatchScore(const str_t& query, str_t* source);
+	void getMatchScore(const str_t& query, const str_t& source, std::unordered_map<str_t, float>& score);
 	void searchShort(str_t& query, std::unordered_map<str_t, float>& score);
 	void searchLong(str_t& query, std::unordered_map<str_t, float>& score);
 	void insert(std::vector<str_t>& key, std::vector<str_t>* additional, const int16_t gSize);	
 	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
 	void search(const char_t* query, char_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
-	void release(char_t*** results, size_t nStrings); 	
+	void release(char_t*** results, size_t nStrings); 
 
-private:
-	std::vector<str_t> longLib;
-	std::vector<str_t> shortLib;
-	std::unordered_map<const str_t*, str_t> wordMap;
-	std::unordered_map<str_t, std::vector<const str_t*>> ngrams;
-	int16_t gramSize = 3;
+	StringIndex& operator=(const StringIndex<str_t>& other)
+	{
+		if (this != &other)
+		{
+			std::copy(other.longLib.begin(), other.longLib.end(), longLib);
+			std::copy(other.shortLib.begin(), other.shortLib.end(), shortLib);
+			std::copy(other.wordMap.begin(), other.wordMap.end(), wordMap);
+			std::copy(other.ngrams.begin(), other.ngrams.end(), ngrams);
+			gramSize = other.gramSize;
+		}
+	}
 
-	std::mutex mutScore;	
-
-	// trim from both ends (in place)
-	template<class str_t>
-	inline void trim(str_t &s) {
-		ltrim(s);
-		rtrim(s);
+	StringIndex& operator=(StringIndex<str_t>&& other)
+	{
+		if (this != &other)
+		{
+			longLib = other.longLib;
+			shortLib = other.shortLib;
+			wordMap = other.wordMap;
+			ngrams = other.ngrams;
+			gramSize = other.gramSize;
+		}
 	}
 
 	template<class str_t>
-	inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
+	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
 	{
 		if (a.second > b.second)
 			return true;
@@ -103,5 +132,30 @@ private:
 			return false;
 		return a.first < b.first;
 	}
+
+	// trim from both ends (in place)
+	template<class str_t>
+	static inline void trim(str_t &s) {
+		ltrim(s);
+		rtrim(s);
+	}
+
+protected:
+	std::vector<str_t> longLib;
+	std::vector<str_t> shortLib;
+	std::unordered_map<const str_t*, str_t> wordMap;
+	std::unordered_map<str_t, std::vector<const str_t*>> ngrams;
+	int16_t gramSize = 3;
+
+private:	
+
+	std::shared_mutex mutScore;
 };
+
+
+DLLEXP void index(char* const guid, char** const key, const size_t size,
+	char** const additional = NULL, const uint16_t gSize = 3, int* weight = NULL);
+
+
+#endif
 
