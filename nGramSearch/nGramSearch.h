@@ -61,65 +61,46 @@ inline void toUpper(std::wstring& str)
 }
 
 template<class str_t>
-class StringIndex 
+class StringIndex
 {
 public:
 	typedef typename str_t::value_type char_t;
 
-	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t gSize, int* weight = NULL);
-	StringIndex(char_t*** const key, const size_t size, const uint16_t gSize, int* weight = NULL);
-
-	StringIndex(const StringIndex<str_t>& other)
-	{
-		std::copy(other.longLib.begin(), other.longLib.end(), longLib);
-		std::copy(other.shortLib.begin(), other.shortLib.end(), shortLib);
-		std::copy(other.wordMap.begin(), other.wordMap.end(), wordMap);
-		std::copy(other.ngrams.begin(), other.ngrams.end(), ngrams);
-		gramSize = other.gramSize;
-	}
+	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t gSize, float* weight = NULL);
+	StringIndex(char_t*** const key, const size_t size, const uint16_t gSize, float* weight = NULL);
+	StringIndex(std::vector<str_t>& key, std::vector<str_t>& additional, const int16_t gSize, float* weight = NULL);
 
 	StringIndex(StringIndex<str_t>&& other)
 	{
-		longLib = other.longLib;
-		shortLib = other.shortLib;
-		wordMap = other.wordMap;
-		ngrams = other.ngrams;
+		longLib = std::move(other.longLib);
+		shortLib = std::move(other.shortLib);
+		wordMap = std::move(other.wordMap);
+		ngrams = std::move(other.ngrams); 		
+		weightVal = std::move(other.weightVal);
 		gramSize = other.gramSize;
 	}
-
+	void init(std::unordered_map<str_t, std::pair<str_t, float>>& tempWordMap);
 	void getGrams(str_t* str);
 	void getGrams(const str_t& str, std::vector<str_t>& generatedGrams);
 	void getGrams(const char_t* str, const int size, std::vector<str_t>& generatedGrams);
 	void buildGrams();
-	int stringMatch(const str_t& query, const str_t& source);
-	void getMatchScore(const str_t& query, const str_t& source, std::unordered_map<str_t*, float>& score);
+	size_t stringMatch(const str_t& query, const str_t& source, std::vector<size_t>& row1, std::vector<size_t>& row2);
+	void getMatchScore(const str_t& query, size_t lb, std::vector<str_t*>& targets, std::vector<float>& currentScore);
 	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);
-	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);
-	void insert(std::vector<str_t>& key, std::vector<str_t>* additional, const int16_t gSize);	
+	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);	
 	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
 	void search(const char_t* query, char_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
-	void release(char_t*** results, size_t nStrings); 
-
-	StringIndex& operator=(const StringIndex<str_t>& other)
-	{
-		if (this != &other)
-		{
-			std::copy(other.longLib.begin(), other.longLib.end(), longLib);
-			std::copy(other.shortLib.begin(), other.shortLib.end(), shortLib);
-			std::copy(other.wordMap.begin(), other.wordMap.end(), wordMap);
-			std::copy(other.ngrams.begin(), other.ngrams.end(), ngrams);
-			gramSize = other.gramSize;
-		}
-	}
+	void release(char_t*** results, size_t nStrings);
 
 	StringIndex& operator=(StringIndex<str_t>&& other)
 	{
 		if (this != &other)
 		{
-			longLib = other.longLib;
-			shortLib = other.shortLib;
-			wordMap = other.wordMap;
-			ngrams = other.ngrams;
+			longLib = std::move(other.longLib);
+			shortLib = std::move(other.shortLib);
+			wordMap = std::move(other.wordMap);
+			ngrams = std::move(other.ngrams);
+			weightVal = std::move(other.weightVal);
 			gramSize = other.gramSize;
 		}
 	}
@@ -144,15 +125,24 @@ public:
 protected:
 	std::vector<str_t> longLib;
 	std::vector<str_t> shortLib;
-	std::unordered_map<str_t*, str_t> wordMap;
+	std::unordered_map<str_t*, std::pair<str_t, float>> wordMap;
 	std::unordered_map<str_t, std::vector<const str_t*>> ngrams;
 	int16_t gramSize = 3;
 
-private:	
-
-	std::mutex mutScore;
+private:
+	int sectionSize = 2000;
 };
 
+DLLEXP void index2D(char* const guid, char*** const key, const size_t size, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index2DW(char* const guid, wchar_t*** const key, const size_t size, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index(char* const guid, char** const key, const size_t size, char** const additional = NULL, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void indexW(char* const guid, wchar_t** const key, const size_t size, wchar_t** const additional = NULL, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
+DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
+DLLEXP void release(char* const guid, char*** results, size_t nStrings);
+DLLEXP void releaseW(char* const guid, wchar_t*** results, size_t nStrings);
+DLLEXP void dispose(char* const guid);
+DLLEXP void disposeW(char* const guid);
 
 #endif
 
