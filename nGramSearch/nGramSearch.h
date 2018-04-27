@@ -19,6 +19,7 @@
 #include <shared_mutex>
 #include <memory>
 #include <mutex>
+#include <set>
 
 #define DLLEXP extern "C" __declspec(dllexport)
 
@@ -85,14 +86,14 @@ public:
 	//void getGrams(const char_t* str, const int size, std::vector<str_t>& generatedGrams);
 	void buildGrams();
 	size_t stringMatch(const str_t& query, const str_t& source, std::vector<size_t>& row1, std::vector<size_t>& row2);
-	void getMatchScore(const str_t& query, size_t lb, std::vector<str_t*>& targets, std::vector<float>& currentScore);
-	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);
+	void getMatchScore(const str_t& query, size_t lb, std::vector<str_t*>& targets, std::vector<float>& currentScore); 
+	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);  
 	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);	
 	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
 	void search(const char_t* query, char_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
 	void release(char_t*** results, size_t nStrings);
-	void buildHash();
-	void getHash(str_t* str);
+	/*void buildHash();
+	str_t getHash(str_t& str);*/
 
 	StringIndex& operator=(StringIndex<str_t>&& other)
 	{
@@ -128,12 +129,12 @@ protected:
 	std::vector<str_t> longLib;
 	std::vector<str_t> shortLib;
 	std::unordered_map<str_t*, std::pair<str_t, float>> wordMap;
-	std::unordered_map<str_t, std::vector<const str_t*>> ngrams;
-	std::unordered_map<str_t, std::vector<const str_t*>> approxHash;
+	std::unordered_map<str_t, std::vector<str_t*>> ngrams;
+	//std::unordered_map<str_t, std::vector<str_t*>> approxHash;
 	int16_t gramSize = 3;
 
 private:
-	int sectionSize = 3000;
+	size_t sectionSize = 3000;
 };
 
 DLLEXP void index2D(char* const guid, char*** const key, const size_t size, const uint16_t gSize = 3, float* weight = NULL);
