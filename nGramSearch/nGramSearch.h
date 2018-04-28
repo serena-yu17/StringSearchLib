@@ -19,7 +19,7 @@
 #include <shared_mutex>
 #include <memory>
 #include <mutex>
-#include <set>
+#include <atomic>
 
 #define DLLEXP extern "C" __declspec(dllexport)
 
@@ -134,7 +134,8 @@ protected:
 	int16_t gramSize = 3;
 
 private:
-	size_t sectionSize = 3000;
+	size_t sectionSize = 1000;
+	atomic<bool> indexed = false;
 };
 
 DLLEXP void index2D(char* const guid, char*** const key, const size_t size, const uint16_t gSize = 3, float* weight = NULL);
