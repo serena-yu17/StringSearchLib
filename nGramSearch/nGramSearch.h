@@ -97,9 +97,9 @@ class StringIndex
 public:
 	typedef typename str_t::value_type char_t;
 
-	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t gSize, float* weight = NULL);
-	StringIndex(char_t*** const key, const size_t size, const uint16_t gSize, float* weight = NULL);
-	StringIndex(std::vector<str_t>& key, std::vector<str_t>& additional, const int16_t gSize, float* weight = NULL);
+	StringIndex(char_t** const key, const size_t size, char_t*** const additional, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
+	StringIndex(char_t*** const key, const size_t size, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
+	StringIndex(std::vector<str_t>& key, std::vector<std::vector<str_t>>& additional, const int16_t gSize, float* weight = NULL);
 
 	StringIndex(StringIndex<str_t>&& other)
 	{
@@ -174,8 +174,10 @@ private:
 
 DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t gSize = 3, float* weight = NULL);
 DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t gSize = 3, float* weight = NULL);
-DLLEXP void index(char* const guid, char** const key, const uint64_t size, char** const additional = NULL, const uint16_t gSize = 3, float* weight = NULL);
-DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, wchar_t** const additional = NULL, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index(char* const guid, char** const key, const uint64_t size, char*** const additional = NULL, const uint16_t rowSize = 0,
+	const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, wchar_t*** const additional = NULL, const uint16_t rowSize = 0,
+	const uint16_t gSize = 3, float* weight = NULL);
 DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
 DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
 DLLEXP void release(char* const guid, char*** results, uint64_t nStrings);
