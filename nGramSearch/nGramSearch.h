@@ -180,21 +180,127 @@ private:
 	std::atomic<bool> indexed = false;
 };
 
+/*@{
+Index the library based on a 2D array.
+@param key For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key
+@param guid A unique id for the indexed library
+@param size size of the [key]
+@param gSize size of grams to be created. Default 3
+@param weight A list of the relative weight of each key. Default 1 for all
+@}
+*/
 DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* weight = NULL);
+
+/*@{
+Index the library based on a 2D array. Wide string version
+@param key For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key
+@param guid A unique id for the indexed library
+@param size size of the [key]
+@param gSize size of grams to be created. Default 3
+@param weight A list of the relative weight of each key. Default 1 for all
+@}*/
 DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* weight = NULL);
+
+/*@{
+Index the library based on a string array of key, and another array of additional text, e.g. description.
+Finally the additional will be mapped back to the keys.
+@param guid A unique id for the indexed library
+@param key keys to be searched for
+@param size size of the array for keys
+@param additional an array of additional text, e.g. descriptions. All rows must have a uniform length. If some strings are missing, leave as blank
+@param rowSize size of each additional text rows
+@param gSize size of grams to be created. Default 3
+@param weight A list of weight values for each key. It should be at least as long as the key array.
+@}*/
 DLLEXP void index(char* const guid, char** const key, const uint64_t size, char** const additional = NULL, const uint16_t rowSize = 1,
 	const uint16_t gSize = 3, float* weight = NULL);
+
+/*@{
+Wide string version to index the library based on a string array of key, and another array of additional text, e.g. description.
+Finally the additional will be mapped back to the keys.
+@param guid A unique id for the indexed library
+@param key keys to be searched for
+@param size size of the array for keys
+@param additional an array of additional text, e.g. descriptions. All rows must have a uniform length. If some strings are missing, leave as blank
+@param rowSize size of each additional text rows
+@param gSize size of grams to be created. Default 3
+@param weight A list of weight values for each key. It should be at least as long as the key array.
+@}*/
 DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, wchar_t** const additional = NULL, const uint16_t rowSize = 1,
 	const uint16_t gSize = 3, float* weight = NULL);
+
+/*@{
+search the query in the indexed library identified by the guid.
+@param guid A unique id for the indexed library
+@param query The query string
+@param results The pointer to a string array for output. The memory will be allocated by new
+@param nStrings Output the length of the results array.
+@param threshold lowest acceptable matching%, as a value between 0 and 1
+@param limit Maximum results generated, default 100
+@}*/
 DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
+
+/*@{
+A wide string version to search the query in the indexed library identified by the guid.
+@param guid A unique id for the indexed library
+@param query The query string
+@param results The pointer to a string array for output. The memory will be allocated by new
+@param nStrings Output the length of the results array.
+@param threshold lowest acceptable matching%, as a value between 0 and 1
+@param limit Maximum results generated, default 100
+@}*/
 DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
+
+/*@{
+To release the memory allocated for the result in the <search> function
+@param guid A unique id for the indexed library
+@param results The result returned by the <search> function.
+@param nStrings Length of <result>
+@}*/
 DLLEXP void release(char* const guid, char*** results, uint64_t nStrings);
+
+/*@{
+To release the memory allocated for the result in the <search> function. Wide string version.
+@param guid A unique id for the indexed library
+@param results The result returned by the <search> function.
+@param nStrings Length of <result>
+@}*/
 DLLEXP void releaseW(char* const guid, wchar_t*** results, uint64_t nStrings);
+
+/*@{
+To dispose a library indexed. If the library does not exist, <dispose> will ignore it.
+@param guid A unique id for the indexed library
+@}*/
 DLLEXP void dispose(char* const guid);
+
+/*@{
+Wide string version. To dispose a library indexed. If the library does not exist, <dispose> will ignore it.
+@param guid A unique id for the indexed library
+@}*/
 DLLEXP void disposeW(char* const guid);
+
+/*@{
+To obtain the current word map size
+@param guid A unique id for the indexed library
+@}*/
 DLLEXP uint64_t getSize(char* const guid);
+
+/*@{
+Wide string version. To obtain the current word map size
+@param guid A unique id for the indexed library
+@}*/
 DLLEXP uint64_t getLibSize(char* const guid);
+
+/*@{
+To obtain the current gram library size
+@param guid A unique id for the indexed library
+@}*/
 DLLEXP uint64_t getSizeW(char* const guid);
+
+/*@{
+Wide string version. To obtain the current gram library size
+@param guid A unique id for the indexed library
+@}*/
 DLLEXP uint64_t getLibSizeW(char* const guid);
 
 #endif
