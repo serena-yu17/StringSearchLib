@@ -139,8 +139,8 @@ public:
 	void release(char_t*** results, size_t nStrings) const;
 	/*void buildHash();
 	str_t getHash(str_t& str);*/
-	size_t size();
-	size_t libSize();
+	uint64_t size();
+	uint64_t libSize();
 
 	template<class str_t>
 	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
