@@ -26,6 +26,7 @@
 
 namespace
 {
+	//Allowed words for the query string. Other characters in the ASCII range will be converted to spaces
 	const std::unordered_set<char> wordChar
 	({
 		'.','%','$',' ',
@@ -34,43 +35,70 @@ namespace
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 	});
 
+	/*@{
+	Trims spaces in place from left of string
+	@param s String to be trimmed
+	@}*/
 	inline void ltrim(std::string &s) {
 		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
 			return !std::isspace(static_cast<unsigned char>(ch));
 		}));
 	}
 
+	/*@{
+	Trims spaces in place from left of string, wide string version
+	@param s String to be trimmed
+	@}*/
 	inline void ltrim(std::wstring &s) {
 		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](wchar_t ch) {
 			return !std::iswspace(ch);
 		}));
 	}
 
-	// trim from end (in place)
+	/*@{
+	Trims spaces in place from right of string
+	@param s String to be trimmed
+	@}*/
 	inline void rtrim(std::string &s) {
 		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
 			return !std::isspace(static_cast<unsigned char>(ch));
 		}).base(), s.end());
 	}
 
+	/*@{
+	Trims spaces in place from right of string, wide string version
+	@param s String to be trimmed
+	@}*/
 	inline void rtrim(std::wstring &s) {
 		s.erase(std::find_if(s.rbegin(), s.rend(), [](wchar_t ch) {
 			return !std::iswspace(ch);
 		}).base(), s.end());
 	}
 
+	/*@{
+	Converts the string to upper case in place
+	@param str String to be converted
+	@}*/
 	inline void toUpper(std::string& str)
 	{
 		for (char& ch : str)
 			ch = toupper(ch);
 	}
 
+	/*@{
+	Converts the string to upper case in place, wide string version
+	@param str String to be converted
+	@}*/
 	inline void toUpper(std::wstring& str)
 	{
 		for (wchar_t& ch : str)
 			ch = towupper(ch);
 	} 
 
+	/*@{
+	Escapes all invalid characters to spaces
+	@param str String to be converted 
+	@}*/
 	inline void escapeBlank(std::string& str)
 	{
 		for (char& ch : str)
@@ -78,6 +106,10 @@ namespace
 				ch = ' ';
 	}
 
+	/*@{
+	Escapes all invalid characters to spaces, wide string version. Only characters that fit into the ASCII range will be converted
+	@param str String to be converted
+	@}*/
 	inline void escapeBlank(std::wstring& str)
 	{
 		for (wchar_t& ch : str)
@@ -92,15 +124,23 @@ namespace
 	}
 }
 
+/*@{
+StringIndex: Each instance manages a library from the <index> function
+@param str_t A STL string type. Can be std::string or std::wstring
+@}*/
 template<class str_t>
 class StringIndex
 {
 public:
+	//The character type invelved in the str_t
 	typedef typename str_t::value_type char_t;
 
-	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
-	StringIndex(char_t*** const key, const size_t size, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
-	StringIndex(std::vector<str_t>& key, std::vector<std::vector<str_t>>& additional, const int16_t gSize, float* weight = NULL);
+	/*@{
+
+	@}*/
+	StringIndex(char_t** const key, const size_t size, const uint16_t rowSize, const uint16_t gSize, float* const weight = NULL);
+	StringIndex(char_t*** const key, const size_t size, const uint16_t rowSize, const uint16_t gSize, float** const weight = NULL);
+	StringIndex(std::vector<std::vector<str_t>>& key, const int16_t gSize, std::vector<std::vector<float>>& weight);
 
 	StringIndex(StringIndex<str_t>&& other)
 	{
@@ -189,7 +229,7 @@ Index the library based on a 2D array.
 @param weight A list of the relative weight of each key. Default 1 for all
 @}
 */
-DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3,  float** const weight = NULL);
 
 /*@{
 Index the library based on a 2D array. Wide string version
@@ -199,7 +239,7 @@ Index the library based on a 2D array. Wide string version
 @param gSize size of grams to be created. Default 3
 @param weight A list of the relative weight of each key. Default 1 for all
 @}*/
-DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3,  float** const weight = NULL);
 
 /*@{
 Index the library based on a string array of key, and another array of additional text, e.g. description.
@@ -207,13 +247,11 @@ Finally the additional will be mapped back to the keys.
 @param guid A unique id for the indexed library
 @param key keys to be searched for
 @param size size of the array for keys
-@param additional an array of additional text, e.g. descriptions. All rows must have a uniform length. If some strings are missing, leave as blank
 @param rowSize size of each additional text rows
 @param gSize size of grams to be created. Default 3
 @param weight A list of weight values for each key. It should be at least as long as the key array.
 @}*/
-DLLEXP void index(char* const guid, char** const key, const uint64_t size, char** const additional = NULL, const uint16_t rowSize = 1,
-	const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index(char* const guid, char** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* const weight = NULL);
 
 /*@{
 Wide string version to index the library based on a string array of key, and another array of additional text, e.g. description.
@@ -221,13 +259,11 @@ Finally the additional will be mapped back to the keys.
 @param guid A unique id for the indexed library
 @param key keys to be searched for
 @param size size of the array for keys
-@param additional an array of additional text, e.g. descriptions. All rows must have a uniform length. If some strings are missing, leave as blank
 @param rowSize size of each additional text rows
 @param gSize size of grams to be created. Default 3
 @param weight A list of weight values for each key. It should be at least as long as the key array.
 @}*/
-DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, wchar_t** const additional = NULL, const uint16_t rowSize = 1,
-	const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, const uint16_t rowSize, const uint16_t gSize = 3, float* const weight = NULL);
 
 /*@{
 search the query in the indexed library identified by the guid.
