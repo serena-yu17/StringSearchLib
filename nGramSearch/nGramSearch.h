@@ -20,6 +20,7 @@
 #include <memory>
 #include <mutex>
 #include <atomic>
+#include <cmath>
 
 #define DLLEXP extern "C" __declspec(dllexport)
 
@@ -97,7 +98,7 @@ class StringIndex
 public:
 	typedef typename str_t::value_type char_t;
 
-	StringIndex(char_t** const key, const size_t size, char_t*** const additional, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
+	StringIndex(char_t** const key, const size_t size, char_t** const additional, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
 	StringIndex(char_t*** const key, const size_t size, const uint16_t rowSize, const uint16_t gSize, float* weight = NULL);
 	StringIndex(std::vector<str_t>& key, std::vector<std::vector<str_t>>& additional, const int16_t gSize, float* weight = NULL);
 
@@ -124,7 +125,7 @@ public:
 		}
 	}
 
-	void init(std::unordered_map<str_t, std::pair<str_t, float>>& tempWordMap);
+	void init(std::unordered_map<str_t, std::vector<std::pair<str_t, float>>>& tempWordMap);
 	void getGrams(str_t* str);
 	void getGrams(const str_t& str, std::vector<str_t>& generatedGrams);
 	//void getGrams(const char_t* str, const int size, std::vector<str_t>& generatedGrams);
@@ -133,7 +134,7 @@ public:
 	void getMatchScore(const str_t& query, size_t lb, std::vector<str_t*>& targets, std::vector<float>& currentScore); 
 	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);  
 	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);	
-	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t*>& result);
+	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
 	void search(const char_t* query, char_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
 	void release(char_t*** results, size_t nStrings) const;
 	/*void buildHash();
@@ -142,13 +143,20 @@ public:
 	size_t libSize();
 
 	template<class str_t>
-	static inline bool compareScores(std::pair<str_t*, float>& a, std::pair<str_t*, float>& b)
+	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
 	{
 		if (a.second > b.second)
 			return true;
 		if (a.second < b.second)
 			return false;
-		return *(a.first) < *(b.first);
+		return a.first.size() < b.first.size();
+	}
+
+
+	template<class str_t>
+	static inline bool compareInt(std::pair<str_t, int>& a, std::pair<str_t, int>& b)
+	{
+		return a.second > b.second;
 	}
 
 	// trim from both ends (in place)
@@ -162,8 +170,8 @@ public:
 protected:
 	std::vector<str_t> longLib;
 	std::vector<str_t> shortLib;
-	std::unordered_map<str_t*, std::pair<str_t, float>> wordMap;
-	std::unordered_map<str_t, std::vector<str_t*>> ngrams;
+	std::unordered_map<str_t*, std::vector<std::pair<str_t, float>>> wordMap;
+	std::unordered_map<str_t, std::vector<std::pair<str_t*, size_t>>> ngrams;
 	//std::unordered_map<str_t, std::vector<str_t*>> approxHash;
 	int16_t gramSize = 3;
 
@@ -172,11 +180,11 @@ private:
 	std::atomic<bool> indexed = false;
 };
 
-DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t gSize = 3, float* weight = NULL);
-DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t gSize = 3, float* weight = NULL);
-DLLEXP void index(char* const guid, char** const key, const uint64_t size, char*** const additional = NULL, const uint16_t rowSize = 0,
+DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, const uint16_t gSize = 3, float* weight = NULL);
+DLLEXP void index(char* const guid, char** const key, const uint64_t size, char** const additional = NULL, const uint16_t rowSize = 1,
 	const uint16_t gSize = 3, float* weight = NULL);
-DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, wchar_t*** const additional = NULL, const uint16_t rowSize = 0,
+DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, wchar_t** const additional = NULL, const uint16_t rowSize = 1,
 	const uint16_t gSize = 3, float* weight = NULL);
 DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
 DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
