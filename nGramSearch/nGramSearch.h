@@ -82,7 +82,8 @@ search the query in the indexed library identified by the guid.
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void search(char* const guid, char* const query, char** const filters, int64_t* const filterSize, uint64_t* priceRange, char*** results, uint32_t* nStrings, const float threshold, const uint32_t limit);
+DLLEXP void search(char* const guid, char* const query, char** const filters, int64_t* const filterSize, uint64_t* priceRange,
+	char*** results, uint32_t* nStrings, const float threshold, const uint32_t limit);
 
 /*@{
 A wide string version to search the query in the indexed library identified by the guid.
@@ -93,7 +94,8 @@ A wide string version to search the query in the indexed library identified by t
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void searchW(char* const guid, wchar_t* const query, wchar_t** const filters, int64_t* const filterSize, uint64_t* priceRange, wchar_t*** results, uint32_t* nStrings, const float threshold, const uint32_t limit);
+DLLEXP void searchW(char* const guid, wchar_t* const query, wchar_t** const filters, int64_t* const filterSize, uint64_t* priceRange,
+	wchar_t*** results, uint32_t* nStrings, const float threshold, const uint32_t limit);
 
 /*@{
 To release the memory allocated for the result in the <search> function
@@ -336,6 +338,7 @@ private:
 	std::atomic<bool> indexed = false;
 	const float distanceFactor = 0.2f;
 	uint16_t attrLength = 0;
+
 	void filterScore(std::unordered_map<str_t*, float>& keyPair, std::unordered_map<str_t, float>& entryScore,
 		std::vector<std::unordered_set<str_t>>& filterVec, std::vector<bool>& filterStatus, size_t* priceRange, float threshold);
 	bool fitAttribute(std::vector<str_t>& attr, std::vector<std::unordered_set<str_t>>& filterVec, std::vector<bool>& filterStatus);
