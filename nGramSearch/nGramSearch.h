@@ -33,8 +33,7 @@ Index the library based on a 2D array.
 @param gSize size of grams to be created. Default 3
 @param weight A list of the relative weight of each key. Default 1 for all
 */
-DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, float** const weight = NULL,
-	char*** const attr = NULL, const uint16_t attrRowSize = 0, uint64_t* priceRange = NULL, const uint16_t gSize = 3);
+DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, float** const weight = NULL, const uint16_t gSize = 3);
 
 /*@{
 Index the library based on a 2D array. Wide string version
@@ -44,8 +43,7 @@ Index the library based on a 2D array. Wide string version
 @param gSize size of grams to be created. Default 3
 @param weight A list of the relative weight of each key. Default 1 for all
 @}*/
-DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, float** const weight = NULL,
-	wchar_t*** const attr = NULL, const uint16_t attrRowSize = 0, uint64_t* priceRange = NULL, const uint16_t gSize = 3);
+DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, float** const weight = NULL, const uint16_t gSize = 3);
 
 /*@{
 Index the library based on a string array of key, and another array of additional text, e.g. description.
@@ -57,8 +55,7 @@ Finally the additional will be mapped back to the keys.
 @param gSize size of grams to be created. Default 3
 @param weight A list of weight values for each key. It should be at least as long as the key array.
 @}*/
-DLLEXP void index(char* const guid, char** const key, const uint64_t size, const uint16_t rowSize = 1, float* const weight = NULL,
-	char** const attr = NULL, const uint16_t attrRowSize = 0, uint64_t* priceRange = NULL, const uint16_t gSize = 3);
+DLLEXP void index(char* const guid, char** const key, const uint64_t size, const uint16_t rowSize = 1, float* const weight = NULL, const uint16_t gSize = 3);
 
 /*@{
 Wide string version to index the library based on a string array of key, and another array of additional text, e.g. description.
@@ -70,8 +67,7 @@ Finally the additional will be mapped back to the keys.
 @param gSize size of grams to be created. Default 3
 @param weight A list of weight values for each key. It should be at least as long as the key array.
 @}*/
-DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, const uint16_t rowSize, float* const weight = NULL,
-	wchar_t** const attr = NULL, const uint16_t attrRowSize = 0, uint64_t* priceRange = NULL, const uint16_t gSize = 3);
+DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, const uint16_t rowSize, float* const weight = NULL, const uint16_t gSize = 3);
 
 /*@{
 search the query in the indexed library identified by the guid.
@@ -82,8 +78,7 @@ search the query in the indexed library identified by the guid.
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void search(char* const guid, char* const query, char** const filters, int64_t* const filterSize, uint64_t* priceRange,
-	char*** results, uint32_t* nStrings, const float threshold, const uint32_t limit);
+DLLEXP void search(char* const guid, char* const query, char*** results, float** score, uint32_t* size, const float threshold, const uint32_t limit);
 
 /*@{
 A wide string version to search the query in the indexed library identified by the guid.
@@ -94,8 +89,7 @@ A wide string version to search the query in the indexed library identified by t
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void searchW(char* const guid, wchar_t* const query, wchar_t** const filters, int64_t* const filterSize, uint64_t* priceRange,
-	wchar_t*** results, uint32_t* nStrings, const float threshold, const uint32_t limit);
+DLLEXP void searchW(char* const guid, wchar_t* const query, wchar_t*** results, float** score, uint32_t* size, const float threshold, const uint32_t limit);
 
 /*@{
 To release the memory allocated for the result in the <search> function
@@ -263,9 +257,9 @@ public:
 	/*@{
 
 	@}*/
-	StringIndex(char_t** const key, const size_t size, const uint16_t rowSize, float* const weight, char_t** const attr, const uint16_t attrRowSize, size_t* priceRange, const uint16_t gSize);
-	StringIndex(char_t*** const key, const size_t size, const uint16_t rowSize, float** const weight, char_t*** const attr, const uint16_t attrRowSize, size_t* priceRange, const uint16_t gSize);
-	StringIndex(std::vector<std::vector<str_t>>& key, std::vector<std::vector<float>>& weight, std::vector<std::vector<str_t>>& attr, std::vector<std::vector<size_t>>& priceRange, const int16_t gSize);
+	StringIndex(char_t** const key, const size_t size, const uint16_t rowSize, float* const weight, const uint16_t gSize);
+	StringIndex(char_t*** const key, const size_t size, const uint16_t rowSize, float** const weight, const uint16_t gSize);
+	StringIndex(std::vector<std::vector<str_t>>& key, std::vector<std::vector<float>>& weight, const int16_t gSize);
 
 	StringIndex(StringIndex<str_t>&& other)
 	{
@@ -290,20 +284,20 @@ public:
 		}
 	}
 
-	void execSearch(char_t* const query, char_t** const filters, int64_t* const filterSize, size_t* priceRange, const float threshold, const uint32_t limit, std::vector<str_t>& result);
-	void search(char_t* const query, char_t** const filters, int64_t* const filterSize, size_t* priceRange, char_t*** results, uint32_t* nStrings, const float threshold = 0, const uint32_t limit = 100);
+	void execSearch(char_t* const query, const float threshold, const uint32_t limit, std::vector<std::pair<str_t*, float>>& result);
+	void search(char_t* const query, char_t*** results, float** score, uint32_t* size, const float threshold, const uint32_t limit);
 	void release(char_t*** results, size_t nStrings) const;
 	uint64_t size();
 	uint64_t libSize();
 
 	template<class str_t>
-	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
+	static inline bool compareScores(std::pair<str_t*, float>& a, std::pair<str_t*, float>& b)
 	{
 		if (a.second > b.second)
 			return true;
 		if (a.second < b.second)
 			return false;
-		return a.first.size() < b.first.size();
+		return a.first->size() < b.first->size();
 	}
 
 
@@ -327,8 +321,6 @@ protected:
 	std::vector<str_t> keyLib;
 	std::unordered_map<str_t*, std::vector<str_t*>> wordMap;
 	std::unordered_map<str_t*, float> wordScore;
-	std::unordered_map<str_t*, std::vector<str_t>> keyAttr;
-	std::unordered_map<str_t*, std::pair<size_t, size_t>> keyPrice;
 	std::unordered_map<str_t, std::unordered_set<str_t*>> ngrams;
 	//std::unordered_map<str_t, std::vector<str_t*>> approxHash;
 	int16_t gramSize = 3;
@@ -339,11 +331,8 @@ private:
 	const float distanceFactor = 0.2f;
 	uint16_t attrLength = 0;
 
-	void filterScore(std::unordered_map<str_t*, float>& keyPair, std::unordered_map<str_t, float>& entryScore,
-		std::vector<std::unordered_set<str_t>>& filterVec, std::vector<bool>& filterStatus, size_t* priceRange, float threshold);
-	bool fitAttribute(std::vector<str_t>& attr, std::vector<std::unordered_set<str_t>>& filterVec, std::vector<bool>& filterStatus);
-	void init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap, std::unordered_map<str_t, float>& tempKeyScore,
-		std::unordered_map<str_t, std::vector<str_t>>& tempAttrLst, std::unordered_map<str_t, std::pair<size_t, size_t>>& tempKeyPrice);
+	void filterScore(std::unordered_map<str_t*, float>& score, std::unordered_map<str_t*, float>& entryScore, float threshold);
+	void init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap, std::unordered_map<str_t, float>& tempKeyScore);
 	void getGrams(str_t* str);
 	void getGrams(const str_t& str, std::vector<str_t>& generatedGrams);
 	//void getGrams(const char_t* str, const int size, std::vector<str_t>& generatedGrams);
