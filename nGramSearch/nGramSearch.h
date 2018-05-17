@@ -284,7 +284,7 @@ public:
 		}
 	}
 
-	std::vector<std::pair<str_t*, float>> execSearch(char_t* const query, const float threshold);
+	void execSearch(char_t* const query, const float threshold, std::vector<std::pair<str_t*, float>>& result);
 	void search(char_t* const query, char_t*** results, float** score, uint32_t* size, const float threshold);
 	void release(char_t*** results, size_t nStrings) const;
 	uint64_t size();
