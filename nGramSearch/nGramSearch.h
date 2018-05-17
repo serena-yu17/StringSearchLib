@@ -175,8 +175,8 @@ public:
 	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);  
 	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);	
 	void search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
-	void search(const char_t* query, char_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
-	void release(char_t*** results, size_t nStrings) const;
+	void search(const char_t* query, char_t*** results, uint32_t* size, const float threshold = 0, uint32_t limit = 100);
+	void release(char_t*** results, size_t size) const;
 	/*void buildHash();
 	str_t getHash(str_t& str);*/
 	uint64_t size();
@@ -271,38 +271,38 @@ search the query in the indexed library identified by the guid.
 @param guid A unique id for the indexed library
 @param query The query string
 @param results The pointer to a string array for output. The memory will be allocated by new
-@param nStrings Output the length of the results array.
+@param size Output the length of the results array.
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
+DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* size, const float threshold = 0, uint32_t limit = 100);
 
 /*@{
 A wide string version to search the query in the indexed library identified by the guid.
 @param guid A unique id for the indexed library
 @param query The query string
 @param results The pointer to a string array for output. The memory will be allocated by new
-@param nStrings Output the length of the results array.
+@param size Output the length of the results array.
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* nStrings, const float threshold = 0, uint32_t limit = 100);
+DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* size, const float threshold = 0, uint32_t limit = 100);
 
 /*@{
 To release the memory allocated for the result in the <search> function
 @param guid A unique id for the indexed library
 @param results The result returned by the <search> function.
-@param nStrings Length of <result>
+@param size Length of <result>
 @}*/
-DLLEXP void release(char* const guid, char*** results, uint64_t nStrings);
+DLLEXP void release(char* const guid, char*** results, uint64_t size);
 
 /*@{
 To release the memory allocated for the result in the <search> function. Wide string version.
 @param guid A unique id for the indexed library
 @param results The result returned by the <search> function.
-@param nStrings Length of <result>
+@param size Length of <result>
 @}*/
-DLLEXP void releaseW(char* const guid, wchar_t*** results, uint64_t nStrings);
+DLLEXP void releaseW(char* const guid, wchar_t*** results, uint64_t size);
 
 /*@{
 To dispose a library indexed. If the library does not exist, <dispose> will ignore it.
