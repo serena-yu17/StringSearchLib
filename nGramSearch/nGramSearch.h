@@ -78,7 +78,7 @@ search the query in the indexed library identified by the guid.
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void search(char* const guid, char* const query, char*** results, float** score, uint32_t* size, const float threshold);
+DLLEXP void search(char* const guid, char* const query, char*** results, float** score, uint32_t* size, const float threshold, const uint32_t limit);
 
 /*@{
 A wide string version to search the query in the indexed library identified by the guid.
@@ -89,7 +89,7 @@ A wide string version to search the query in the indexed library identified by t
 @param threshold lowest acceptable matching%, as a value between 0 and 1
 @param limit Maximum results generated, default 100
 @}*/
-DLLEXP void searchW(char* const guid, wchar_t* const query, wchar_t*** results, float** score, uint32_t* size, const float threshold);
+DLLEXP void searchW(char* const guid, wchar_t* const query, wchar_t*** results, float** score, uint32_t* size, const float threshold, const uint32_t limit);
 
 /*@{
 To release the memory allocated for the result in the <search> function
@@ -284,8 +284,8 @@ public:
 		}
 	}
 
-	void execSearch(char_t* const query, const float threshold, std::vector<std::pair<str_t*, float>>& result);
-	void search(char_t* const query, char_t*** results, float** score, uint32_t* size, const float threshold);
+	void execSearch(char_t* const query, const float threshold, const uint32_t limit, std::vector<std::pair<str_t*, float>>& result);
+	void search(char_t* const query, char_t*** results, float** score, uint32_t* size, const float threshold, const uint32_t limit);
 	void release(char_t*** results, float** score, size_t nStrings) const;
 	uint64_t size();
 	uint64_t libSize();
