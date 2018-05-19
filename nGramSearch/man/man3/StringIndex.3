@@ -1,0 +1,325 @@
+.TH "StringIndex< str_t >" 3 "Sat May 19 2018" "Version 1.0" "nGram search" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+StringIndex< str_t >
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <nGramSearch\&.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "typedef str_t::value_type \fBchar_t\fP"
+.br
+.RI "The character type invelved in the str_t\&. "
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBStringIndex\fP (\fBchar_t\fP **const words, const size_t \fBsize\fP, const uint16_t rowSize, float *const weight, const uint16_t gSize)"
+.br
+.ti -1c
+.RI "\fBStringIndex\fP (\fBchar_t\fP ***const words, const size_t \fBsize\fP, const uint16_t rowSize, float **const weight, const uint16_t gSize)"
+.br
+.ti -1c
+.RI "\fBStringIndex\fP (std::vector< std::vector< str_t >> &words, const int16_t gSize, std::vector< std::vector< float >> &weight)"
+.br
+.ti -1c
+.RI "void \fBinit\fP (std::unordered_map< str_t, std::vector< std::pair< str_t, float >>> &tempWordMap)"
+.br
+.ti -1c
+.RI "void \fBgetGrams\fP (str_t *str)"
+.br
+.ti -1c
+.RI "void \fBgetGrams\fP (const str_t &str, std::vector< str_t > &generatedGrams)"
+.br
+.ti -1c
+.RI "void \fBbuildGrams\fP ()"
+.br
+.ti -1c
+.RI "size_t \fBstringMatch\fP (const str_t &query, const str_t &source, std::vector< size_t > &row1, std::vector< size_t > &row2)"
+.br
+.ti -1c
+.RI "void \fBgetMatchScore\fP (const str_t &query, size_t first, std::vector< str_t *> &targets, std::vector< float > &currentScore)"
+.br
+.ti -1c
+.RI "void \fBsearchShort\fP (str_t &query, std::unordered_map< str_t *, float > &score)"
+.br
+.ti -1c
+.RI "void \fBsearchLong\fP (str_t &query, std::unordered_map< str_t *, float > &score)"
+.br
+.ti -1c
+.RI "void \fB_search\fP (const \fBchar_t\fP *query, const float threshold, const uint32_t limit, std::vector< str_t > &result)"
+.br
+.ti -1c
+.RI "void \fBsearch\fP (const \fBchar_t\fP *query, \fBchar_t\fP ***results, uint32_t *\fBsize\fP, const float threshold, uint32_t limit)"
+.br
+.ti -1c
+.RI "void \fBrelease\fP (\fBchar_t\fP ***results, size_t \fBsize\fP) const"
+.br
+.ti -1c
+.RI "uint64_t \fBsize\fP ()"
+.br
+.ti -1c
+.RI "uint64_t \fBlibSize\fP ()"
+.br
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "template<class str_t > static bool \fBcompareScores\fP (std::pair< str_t, float > &a, std::pair< str_t, float > &b)"
+.br
+.ti -1c
+.RI "template<class str_t > static void \fBtrim\fP (str_t &s)"
+.br
+.in -1c
+.SS "Protected Attributes"
+
+.in +1c
+.ti -1c
+.RI "std::vector< str_t > \fBlongLib\fP"
+.br
+.RI "The library for all words that have a length >= \fCgramSize\fP * 2\&. "
+.ti -1c
+.RI "std::vector< str_t > \fBshortLib\fP"
+.br
+.RI "The library for all words that have a length < \fCgramSize\fP * 2\&. "
+.ti -1c
+.RI "std::unordered_map< str_t *, std::vector< std::pair< str_t, float > > > \fBwordMap\fP"
+.br
+.RI "All words, mapped to their master keys\&. A search result will always be redirected to its master keys\&. "
+.ti -1c
+.RI "std::unordered_map< str_t, std::unordered_set< str_t * > > \fBngrams\fP"
+.br
+.RI "The n-gram library generated\&. "
+.ti -1c
+.RI "int16_t \fBgramSize\fP = 3"
+.br
+.RI "the size of n-grams "
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SS "template<class str_t>
+.br
+class StringIndex< str_t >"
+\fBStringIndex\fP: Each instance manages a library from the <index> function 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr_t\fP A STL string type\&. Can be std::string or std::wstring 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "template<class str_t > \fBStringIndex\fP< str_t >::\fBStringIndex\fP (\fBchar_t\fP **const words, const size_t size, const uint16_t rowSize, float *const weight, const uint16_t gSize)"
+Constructs the \fBStringIndex\fP class by indexing the strings based on an array of words 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwords\fP Words to be searched for\&. For each row, the first word is used as the master key, in which the row size is \fCrowSize\fP\&. All rows are flattened into a 1D-array, and can be extracted based on \fCrowSize\fP\&. In a search, all queries of the words in a row will return the master key\&. 
+.br
+\fIsize\fP size of the \fCwords\fP 
+.br
+\fIrowSize\fP size of each text rows of \fCwords\fP\&. 
+.br
+\fIweight\fP A list of weight values for each key\&. It should be at least as long as the number of rows, i\&.e\&. \fCsize\fP / \fCrowSize\fP\&. 
+.br
+\fIgSize\fP size of grams to be created\&. Default 3\&. 
+.RE
+.PP
+
+.SS "template<class str_t > \fBStringIndex\fP< str_t >::\fBStringIndex\fP (\fBchar_t\fP ***const words, const size_t size, const uint16_t rowSize, float **const weight, const uint16_t gSize)"
+Constructs the \fBStringIndex\fP class by indexing the strings based on an array of words 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwords\fP Words to be searched for\&. For each row, the first word is used as the master key, in which the row size is \fCrowSize\fP\&. Each row is in a separate sub-array\&. In a search, all queries of the words in a row will return the master key\&. 
+.br
+\fIsize\fP size of the \fCwords\fP 
+.br
+\fIrowSize\fP size of each text rows of \fCwords\fP\&. 
+.br
+\fIweight\fP A list of weight values for each key\&. It should be at least as long as the number of rows, i\&.e\&. \fCsize\fP / \fCrowSize\fP\&. 
+.br
+\fIgSize\fP size of grams to be created\&. Default 3\&. 
+.RE
+.PP
+
+.SS "template<class str_t > \fBStringIndex\fP< str_t >::\fBStringIndex\fP (std::vector< std::vector< str_t >> & words, const int16_t gSize, std::vector< std::vector< float >> & weight)"
+Constructs the \fBStringIndex\fP class by indexing the strings based on an array of words 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwords\fP Words to be searched for\&. For each row, the first word is used as the master key, in which the row size is \fCrowSize\fP\&. Each row is in a separate sub-array\&. In a search, all queries of the words in a row will return the master key\&. 
+.br
+\fIsize\fP size of the \fCwords\fP 
+.br
+\fIrowSize\fP size of each text rows of \fCwords\fP\&. 
+.br
+\fIweight\fP A list of weight values for each key\&. It should be at least as long as the number of rows, i\&.e\&. \fCsize\fP / \fCrowSize\fP\&. 
+.br
+\fIgSize\fP size of grams to be created\&. Default 3\&. 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::_search (const \fBchar_t\fP * query, const float threshold, const uint32_t limit, std::vector< str_t > & result)"
+The worker function for search 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP The query string\&. 
+.br
+\fIthreshold\fP Lowest acceptable match ratio for a string to be included in the results\&. 
+.br
+\fIlimit\fP The maximum number of results to generate\&. 
+.br
+\fIresult\fP The matching strings to be selected, sorted from highest score to lowest\&. 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::buildGrams ()"
+Build n-grams for the member variable \fClongLib\fP 
+.SS "template<class str_t > template<class str_t > static bool \fBStringIndex\fP< str_t >::compareScores (std::pair< str_t, float > & a, std::pair< str_t, float > & b)\fC [inline]\fP, \fC [static]\fP"
+Compare pairs of string-score by their score, and length\&. Greater scores and shorter lengths will be prioritized 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIa\fP The first pair of string-score 
+.br
+\fIb\fP The second pair of string-score 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::getGrams (str_t * str)"
+Generate n-grams from a string based on the member variable \fCgramSize\fP\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP A pointer to the string to generate n-grams from\&. 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::getGrams (const str_t & str, std::vector< str_t > & generatedGrams)"
+Generate n-grams from a string based on the member variable \fCgramSize\fP, and store in an array\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstr\fP A pointer to the string to generate n-grams from\&. 
+.br
+\fIgeneratedGrams\fP A vector to store the genearated n-grams 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::getMatchScore (const str_t & query, size_t first, std::vector< str_t *> & targets, std::vector< float > & currentScore)"
+A looper to calculate match scores 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP The query string\&. 
+.br
+\fIfirst\fP The starting index to loop from\&. 
+.br
+\fItargets\fP The target strings that have been scored 
+.br
+\fIcurrentScore\fP The score for each strings in \fCtargets\fP 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::init (std::unordered_map< str_t, std::vector< std::pair< str_t, float >>> & tempWordMap)"
+Initiates the word map by assigning the same strings to a pointer, to save space\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItempWordMap\fP A temprary word map of strings\&. Key: query terms\&. Value: a list of master keys and corresponding scores that the queries point to\&. 
+.RE
+.PP
+
+.SS "template<class str_t > uint64_t \fBStringIndex\fP< str_t >::libSize ()"
+Get the size of the n-gram library \fCngrams\fP 
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::release (\fBchar_t\fP *** results, size_t size) const"
+Release a result pointer that have been generated in \fCsearch\fP 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIresults\fP The matching strings to be selected, allocated using the \fCnew\fP operator\&. 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::search (const \fBchar_t\fP * query, \fBchar_t\fP *** results, uint32_t * size, const float threshold, uint32_t limit)"
+The search interface function, calls \fC_search\fP 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP The query string\&. 
+.br
+\fIresults\fP The matching strings to be selected, sorted from highest score to lowest\&. 
+.br
+\fIsize\fP The number of strings in the result array\&. 
+.br
+\fIthreshold\fP Lowest acceptable match ratio for a string to be included in the results\&. 
+.br
+\fIlimit\fP The maximum number of results to generate\&. 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::searchLong (str_t & query, std::unordered_map< str_t *, float > & score)"
+Search in the longLib 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP The query string\&. 
+.br
+\fIscore\fP Targets found paired with their corresponding cores generated\&. 
+.RE
+.PP
+
+.SS "template<class str_t > void \fBStringIndex\fP< str_t >::searchShort (str_t & query, std::unordered_map< str_t *, float > & score)"
+Search in the shortLib 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP The query string\&. 
+.br
+\fIscore\fP Targets found paired with their corresponding cores generated\&. 
+.RE
+.PP
+
+.SS "template<class str_t > uint64_t \fBStringIndex\fP< str_t >::size ()"
+Get the size of the word map \fCwordMap\fP 
+.SS "template<class str_t > size_t \fBStringIndex\fP< str_t >::stringMatch (const str_t & query, const str_t & source, std::vector< size_t > & row1, std::vector< size_t > & row2)"
+Computes the percentage of \fCquery\fP matches \fCsource\fP\&. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIquery\fP A query string 
+.br
+\fIsource\fP A source string in the library to compare to\&. 
+.br
+\fIrow1\fP A temporary vector as a cache for the algorithm\&. Its size must at least (the max size of \fCquery\fP and \fCsource\fP) + 1\&. 
+.br
+\fIrow2\fP A temporary vector as a cache for the algorithm\&. Its size must at least (the max size of \fCquery\fP and \fCsource\fP) + 1\&. 
+.RE
+.PP
+
+.SS "template<class str_t > template<class str_t > static void \fBStringIndex\fP< str_t >::trim (str_t & s)\fC [inline]\fP, \fC [static]\fP"
+Trim a string from both ends (in place) 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIs\fP The string to be trimmed 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for nGram search from the source code\&.
