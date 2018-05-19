@@ -259,7 +259,7 @@ template<class str_t>
 class StringIndex
 {
 public:
-	//! The character type invelved in the str_t
+	//! The character type contained in the str_t
 	typedef typename str_t::value_type char_t;
 
 	/*!

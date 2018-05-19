@@ -32,7 +32,5 @@ var NAVTREEINDEX0 =
 "functions_vars.html":[0,2,2],
 "index.html":[],
 "n_gram_search_8h_source.html":[1,0,0],
-"pages.html":[],
-"stdafx_8h_source.html":[1,0,1],
-"targetver_8h_source.html":[1,0,2]
+"pages.html":[]
 };
