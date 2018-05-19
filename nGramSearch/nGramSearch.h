@@ -24,21 +24,21 @@
 Index the library based on a 2D array.
 @param words For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key
 @param guid A unique id for the indexed library
-@param size size of the [key]
+@param size size of the \p words
 @param gSize size of grams to be created. Default 3
 @param weight A list of the relative weight of each key. Default 1 for all
 */
-DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize = 1, float** const weight = NULL, const uint16_t gSize = 3);
+DLLEXP void index2D(char* const guid, char*** const key, const uint64_t size, const uint16_t rowSize, float** const weight = NULL, const uint16_t gSize = 3);
 
 /*!
 Index the library based on a 2D array. Wide string version
 @param words For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key
 @param guid A unique id for the indexed library
-@param size size of the \p key
+@param size size of the \p words
 @param gSize size of grams to be created. Default 3
 @param weight A list of the relative weight of each key. Default 1 for all
 */
-DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize = 1, float** const weight = NULL, const uint16_t gSize = 3);
+DLLEXP void index2DW(char* const guid, wchar_t*** const key, const uint64_t size, const uint16_t rowSize, float** const weight = NULL, const uint16_t gSize = 3);
 
 /*!
 Index the library based on a string array of key, and another array of additional text, e.g. description.
@@ -51,7 +51,7 @@ In a search, all queries of the words in a row will return the master key.
 @param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
 @param gSize size of grams to be created. Default 3.
 */
-DLLEXP void index(char* const guid, char** const key, const uint64_t size, const uint16_t rowSize = 1, float* const weight = NULL, const uint16_t gSize = 3);
+DLLEXP void index(char* const guid, char** const key, const uint64_t size, const uint16_t rowSize, float* const weight = NULL, const uint16_t gSize = 3);
 
 /*!
 Index the library based on a string array of key, and another array of additional text, e.g. description.
@@ -71,21 +71,23 @@ DLLEXP void indexW(char* const guid, wchar_t** const key, const uint64_t size, c
 Search the query in the indexed library identified by the guid.
 @param guid A unique id for the indexed library
 @param query The query string
-@param results The pointer to a string array for output. The memory will be allocated by new
+@param results The pointer to a string array for output. The memory will be allocated by new.
+Must call \p release to clean up after use.
 @param size Output the length of the \p results array.
-@param threshold Lowest acceptable matching%, as a value between 0 and 1
+@param threshold Lowest acceptable matching %, as a value between 0 and 1
 @param limit Maximum results generated
 */
 DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* size, const float threshold = 0, uint32_t limit = 100);
 
 /*!
-ASearch the query in the indexed library identified by the guid.
+Search the query in the indexed library identified by the guid.
 Wide string version
 @param guid A unique id for the indexed library
 @param query The query string
-@param results The pointer to a string array for output. The memory will be allocated by new
+@param results The pointer to a string array for output. The memory will be allocated by new. 
+Must call \p releaseW to clean up after use.
 @param size Output the length of the \p results array.
-@param threshold Lowest acceptable matching%, as a value between 0 and 1
+@param threshold Lowest acceptable matching %, as a value between 0 and 1
 @param limit Maximum results generated
 */
 DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* size, const float threshold = 0, uint32_t limit = 100);

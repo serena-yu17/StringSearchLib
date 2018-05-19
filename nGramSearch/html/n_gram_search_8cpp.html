@@ -316,7 +316,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const uint16_t&#160;</td>
-          <td class="paramname"><em>rowSize</em> = <code>1</code>, </td>
+          <td class="paramname"><em>rowSize</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -379,7 +379,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const uint16_t&#160;</td>
-          <td class="paramname"><em>rowSize</em> = <code>1</code>, </td>
+          <td class="paramname"><em>rowSize</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -404,7 +404,7 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">words</td><td>For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key </td></tr>
     <tr><td class="paramname">guid</td><td>A unique id for the indexed library </td></tr>
-    <tr><td class="paramname">size</td><td>size of the [key] </td></tr>
+    <tr><td class="paramname">size</td><td>size of the <code>words</code> </td></tr>
     <tr><td class="paramname">gSize</td><td>size of grams to be created. Default 3 </td></tr>
     <tr><td class="paramname">weight</td><td>A list of the relative weight of each key. Default 1 for all </td></tr>
   </table>
@@ -441,7 +441,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const uint16_t&#160;</td>
-          <td class="paramname"><em>rowSize</em> = <code>1</code>, </td>
+          <td class="paramname"><em>rowSize</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -466,7 +466,7 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">words</td><td>For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key </td></tr>
     <tr><td class="paramname">guid</td><td>A unique id for the indexed library </td></tr>
-    <tr><td class="paramname">size</td><td>size of the <code>key</code> </td></tr>
+    <tr><td class="paramname">size</td><td>size of the <code>words</code> </td></tr>
     <tr><td class="paramname">gSize</td><td>size of grams to be created. Default 3 </td></tr>
     <tr><td class="paramname">weight</td><td>A list of the relative weight of each key. Default 1 for all </td></tr>
   </table>
@@ -675,9 +675,9 @@ Variables</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">guid</td><td>A unique id for the indexed library </td></tr>
     <tr><td class="paramname">query</td><td>The query string </td></tr>
-    <tr><td class="paramname">results</td><td>The pointer to a string array for output. The memory will be allocated by new </td></tr>
+    <tr><td class="paramname">results</td><td>The pointer to a string array for output. The memory will be allocated by new. Must call <code>release</code> to clean up after use. </td></tr>
     <tr><td class="paramname">size</td><td>Output the length of the <code>results</code> array. </td></tr>
-    <tr><td class="paramname">threshold</td><td>Lowest acceptable matching%, as a value between 0 and 1 </td></tr>
+    <tr><td class="paramname">threshold</td><td>Lowest acceptable matching %, as a value between 0 and 1 </td></tr>
     <tr><td class="paramname">limit</td><td>Maximum results generated </td></tr>
   </table>
   </dd>
@@ -734,13 +734,13 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>ASearch the query in the indexed library identified by the guid. Wide string version </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Search the query in the indexed library identified by the guid. Wide string version </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">guid</td><td>A unique id for the indexed library </td></tr>
     <tr><td class="paramname">query</td><td>The query string </td></tr>
-    <tr><td class="paramname">results</td><td>The pointer to a string array for output. The memory will be allocated by new </td></tr>
+    <tr><td class="paramname">results</td><td>The pointer to a string array for output. The memory will be allocated by new. Must call <code>releaseW</code> to clean up after use. </td></tr>
     <tr><td class="paramname">size</td><td>Output the length of the <code>results</code> array. </td></tr>
-    <tr><td class="paramname">threshold</td><td>Lowest acceptable matching%, as a value between 0 and 1 </td></tr>
+    <tr><td class="paramname">threshold</td><td>Lowest acceptable matching %, as a value between 0 and 1 </td></tr>
     <tr><td class="paramname">limit</td><td>Maximum results generated </td></tr>
   </table>
   </dd>

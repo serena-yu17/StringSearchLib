@@ -1,0 +1,932 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.14">
+  <compounddef id="class_string_index" kind="class" language="C++" prot="public">
+    <compoundname>StringIndex</compoundname>
+    <includes refid="n_gram_search_8h" local="no">nGramSearch.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class str_t</type>
+      </param>
+    </templateparamlist>
+      <sectiondef kind="public-type">
+      <memberdef kind="typedef" id="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" prot="public" static="no">
+        <type>str_t::value_type</type>
+        <definition>typedef str_t::value_type StringIndex&lt; str_t &gt;::char_t</definition>
+        <argsstring></argsstring>
+        <name>char_t</name>
+        <briefdescription>
+<para>The character type contained in the str_t. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="265" column="1" bodyfile="nGramSearch.h" bodystart="265" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="class_string_index_1ac41713b30c0c373a3e9fc3efe13f9949" prot="protected" static="no" mutable="no">
+        <type>std::vector&lt; str_t &gt;</type>
+        <definition>std::vector&lt;str_t&gt; StringIndex&lt; str_t &gt;::longLib</definition>
+        <argsstring></argsstring>
+        <name>longLib</name>
+        <briefdescription>
+<para>The library for all words that have a length &gt;= <computeroutput>gramSize</computeroutput> * 2. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="421" column="1" bodyfile="nGramSearch.h" bodystart="421" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_string_index_1a4f0c00d4ace341b657ac1b233b70534b" prot="protected" static="no" mutable="no">
+        <type>std::vector&lt; str_t &gt;</type>
+        <definition>std::vector&lt;str_t&gt; StringIndex&lt; str_t &gt;::shortLib</definition>
+        <argsstring></argsstring>
+        <name>shortLib</name>
+        <briefdescription>
+<para>The library for all words that have a length &lt; <computeroutput>gramSize</computeroutput> * 2. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="424" column="1" bodyfile="nGramSearch.h" bodystart="424" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_string_index_1aaf98238698a0294638fb474c4962eac7" prot="protected" static="no" mutable="no">
+        <type>std::unordered_map&lt; str_t *, std::vector&lt; std::pair&lt; str_t, float &gt; &gt; &gt;</type>
+        <definition>std::unordered_map&lt;str_t*, std::vector&lt;std::pair&lt;str_t, float&gt; &gt; &gt; StringIndex&lt; str_t &gt;::wordMap</definition>
+        <argsstring></argsstring>
+        <name>wordMap</name>
+        <briefdescription>
+<para>All words, mapped to their master keys. A search result will always be redirected to its master keys. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="427" column="1" bodyfile="nGramSearch.h" bodystart="427" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_string_index_1adae09412441dcac487fd942660ca72f5" prot="protected" static="no" mutable="no">
+        <type>std::unordered_map&lt; str_t, std::unordered_set&lt; str_t * &gt; &gt;</type>
+        <definition>std::unordered_map&lt;str_t, std::unordered_set&lt;str_t*&gt; &gt; StringIndex&lt; str_t &gt;::ngrams</definition>
+        <argsstring></argsstring>
+        <name>ngrams</name>
+        <briefdescription>
+<para>The n-gram library generated. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="430" column="1" bodyfile="nGramSearch.h" bodystart="430" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_string_index_1aadcaf2dd0a288b18d85febf8157de6be" prot="protected" static="no" mutable="no">
+        <type>int16_t</type>
+        <definition>int16_t StringIndex&lt; str_t &gt;::gramSize</definition>
+        <argsstring></argsstring>
+        <name>gramSize</name>
+        <initializer>= 3</initializer>
+        <briefdescription>
+<para>the size of n-grams </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="433" column="1" bodyfile="nGramSearch.h" bodystart="433" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_string_index_1a7dade98e0cf386cbb8ab704421412f15" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t StringIndex&lt; str_t &gt;::sectionSize</definition>
+        <argsstring></argsstring>
+        <name>sectionSize</name>
+        <initializer>= 1000</initializer>
+        <briefdescription>
+<para>The section size of strings for each <computeroutput>getMatchScore</computeroutput> loop block. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="437" column="1" bodyfile="nGramSearch.h" bodystart="437" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_string_index_1ad52e11abab57f0175d9da8e22d602464" prot="private" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; StringIndex&lt; str_t &gt;::indexed</definition>
+        <argsstring></argsstring>
+        <name>indexed</name>
+        <initializer>= false</initializer>
+        <briefdescription>
+<para>Indicator of whether the library has been indexed. If not indexed, no search can be done. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="440" column="1" bodyfile="nGramSearch.h" bodystart="440" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_string_index_1a3b9f3efd8c61c708861b4161dd88038a" prot="private" static="no" mutable="no">
+        <type>const float</type>
+        <definition>const float StringIndex&lt; str_t &gt;::distanceFactor</definition>
+        <argsstring></argsstring>
+        <name>distanceFactor</name>
+        <initializer>= 0.2f</initializer>
+        <briefdescription>
+<para>deprecated </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="443" column="1" bodyfile="nGramSearch.h" bodystart="443" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_string_index_1aec0c7112ef81d953265033f9a779730f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>StringIndex&lt; str_t &gt;::StringIndex</definition>
+        <argsstring>(char_t **const words, const size_t size, const uint16_t rowSize, float *const weight, const uint16_t gSize)</argsstring>
+        <name>StringIndex</name>
+        <param>
+          <type><ref refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" kindref="member">char_t</ref> **const</type>
+          <declname>words</declname>
+        </param>
+        <param>
+          <type>const size_t</type>
+          <declname>size</declname>
+        </param>
+        <param>
+          <type>const uint16_t</type>
+          <declname>rowSize</declname>
+        </param>
+        <param>
+          <type>float *const</type>
+          <declname>weight</declname>
+        </param>
+        <param>
+          <type>const uint16_t</type>
+          <declname>gSize</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Constructs the <ref refid="class_string_index" kindref="compound">StringIndex</ref> class by indexing the strings based on an array of words <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>words</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Words to be searched for. For each row, the first word is used as the master key, in which the row size is <computeroutput>rowSize</computeroutput>. All rows are flattened into a 1D-array, and can be extracted based on <computeroutput>rowSize</computeroutput>. In a search, all queries of the words in a row will return the master key. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of the <computeroutput>words</computeroutput> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>rowSize</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of each text rows of <computeroutput>words</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>weight</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A list of weight values for each key. It should be at least as long as the number of rows, i.e. <computeroutput>size</computeroutput> / <computeroutput>rowSize</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gSize</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of grams to be created. Default 3. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="277" column="1" bodyfile="nGramSearch.cpp" bodystart="184" bodyend="224"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a2e323737994e475a5e5b6ccc9f631fff" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>StringIndex&lt; str_t &gt;::StringIndex</definition>
+        <argsstring>(char_t ***const words, const size_t size, const uint16_t rowSize, float **const weight, const uint16_t gSize)</argsstring>
+        <name>StringIndex</name>
+        <param>
+          <type><ref refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" kindref="member">char_t</ref> ***const</type>
+          <declname>words</declname>
+        </param>
+        <param>
+          <type>const size_t</type>
+          <declname>size</declname>
+        </param>
+        <param>
+          <type>const uint16_t</type>
+          <declname>rowSize</declname>
+        </param>
+        <param>
+          <type>float **const</type>
+          <declname>weight</declname>
+        </param>
+        <param>
+          <type>const uint16_t</type>
+          <declname>gSize</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Constructs the <ref refid="class_string_index" kindref="compound">StringIndex</ref> class by indexing the strings based on an array of words <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>words</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Words to be searched for. For each row, the first word is used as the master key, in which the row size is <computeroutput>rowSize</computeroutput>. Each row is in a separate sub-array. In a search, all queries of the words in a row will return the master key. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of the <computeroutput>words</computeroutput> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>rowSize</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of each text rows of <computeroutput>words</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>weight</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A list of weight values for each key. It should be at least as long as the number of rows, i.e. <computeroutput>size</computeroutput> / <computeroutput>rowSize</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gSize</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of grams to be created. Default 3. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="288" column="1" bodyfile="nGramSearch.cpp" bodystart="269" bodyend="310"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1ab7114eb0acf9e736de851487398a4cef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>StringIndex&lt; str_t &gt;::StringIndex</definition>
+        <argsstring>(std::vector&lt; std::vector&lt; str_t &gt;&gt; &amp;words, const int16_t gSize, std::vector&lt; std::vector&lt; float &gt;&gt; &amp;weight)</argsstring>
+        <name>StringIndex</name>
+        <param>
+          <type>std::vector&lt; std::vector&lt; str_t &gt;&gt; &amp;</type>
+          <declname>words</declname>
+        </param>
+        <param>
+          <type>const int16_t</type>
+          <declname>gSize</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; std::vector&lt; float &gt;&gt; &amp;</type>
+          <declname>weight</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Constructs the <ref refid="class_string_index" kindref="compound">StringIndex</ref> class by indexing the strings based on an array of words <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>words</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Words to be searched for. For each row, the first word is used as the master key, in which the row size is <computeroutput>rowSize</computeroutput>. Each row is in a separate sub-array. In a search, all queries of the words in a row will return the master key. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of the <computeroutput>words</computeroutput> </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>rowSize</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of each text rows of <computeroutput>words</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>weight</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A list of weight values for each key. It should be at least as long as the number of rows, i.e. <computeroutput>size</computeroutput> / <computeroutput>rowSize</computeroutput>. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>gSize</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>size of grams to be created. Default 3. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="299" column="1" bodyfile="nGramSearch.cpp" bodystart="227" bodyend="266"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a56c849706990da23bb621522da959fa9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::init</definition>
+        <argsstring>(std::unordered_map&lt; str_t, std::vector&lt; std::pair&lt; str_t, float &gt;&gt;&gt; &amp;tempWordMap)</argsstring>
+        <name>init</name>
+        <param>
+          <type>std::unordered_map&lt; str_t, std::vector&lt; std::pair&lt; str_t, float &gt;&gt;&gt; &amp;</type>
+          <declname>tempWordMap</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Initiates the word map by assigning the same strings to a pointer, to save space. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>tempWordMap</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A temprary word map of strings. Key: query terms. Value: a list of master keys and corresponding scores that the queries point to. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="306" column="1" bodyfile="nGramSearch.cpp" bodystart="151" bodyend="181"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a924cd52b4e055853db22f89e73f71fce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::getGrams</definition>
+        <argsstring>(str_t *str)</argsstring>
+        <name>getGrams</name>
+        <param>
+          <type>str_t *</type>
+          <declname>str</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Generate n-grams from a string based on the member variable <computeroutput>gramSize</computeroutput>. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>str</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A pointer to the string to generate n-grams from. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="312" column="1" bodyfile="nGramSearch.cpp" bodystart="126" bodyend="133"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a1b66797dae7f0f1d4f3cf830dfeee869" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::getGrams</definition>
+        <argsstring>(const str_t &amp;str, std::vector&lt; str_t &gt; &amp;generatedGrams)</argsstring>
+        <name>getGrams</name>
+        <param>
+          <type>const str_t &amp;</type>
+          <declname>str</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; str_t &gt; &amp;</type>
+          <declname>generatedGrams</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Generate n-grams from a string based on the member variable <computeroutput>gramSize</computeroutput>, and store in an array. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>str</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A pointer to the string to generate n-grams from. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>generatedGrams</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A vector to store the genearated n-grams </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="319" column="1" bodyfile="nGramSearch.cpp" bodystart="136" bodyend="140"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a7e326eb6fe367a6758c21aefbf64fe51" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::buildGrams</definition>
+        <argsstring>()</argsstring>
+        <name>buildGrams</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Build n-grams for the member variable <computeroutput>longLib</computeroutput> </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="324" column="1" bodyfile="nGramSearch.cpp" bodystart="143" bodyend="148"/>
+        <references refid="n_gram_search_8cpp_1ad55ada7f4591fa63653a5ab560568037" compoundref="n_gram_search_8cpp" startline="9">indexed</references>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a97835599308c1e5feb47323545584dfd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t StringIndex&lt; str_t &gt;::stringMatch</definition>
+        <argsstring>(const str_t &amp;query, const str_t &amp;source, std::vector&lt; size_t &gt; &amp;row1, std::vector&lt; size_t &gt; &amp;row2)</argsstring>
+        <name>stringMatch</name>
+        <param>
+          <type>const str_t &amp;</type>
+          <declname>query</declname>
+        </param>
+        <param>
+          <type>const str_t &amp;</type>
+          <declname>source</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; size_t &gt; &amp;</type>
+          <declname>row1</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; size_t &gt; &amp;</type>
+          <declname>row2</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Computes the percentage of <computeroutput>query</computeroutput> matches <computeroutput>source</computeroutput>. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>query</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A query string </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>source</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A source string in the library to compare to. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>row1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A temporary vector as a cache for the algorithm. Its size must at least (the max size of <computeroutput>query</computeroutput> and <computeroutput>source</computeroutput>) + 1. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>row2</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A temporary vector as a cache for the algorithm. Its size must at least (the max size of <computeroutput>query</computeroutput> and <computeroutput>source</computeroutput>) + 1. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="333" column="1" bodyfile="nGramSearch.cpp" bodystart="313" bodyend="352"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a32f2294a19ad5360bd62f1ede07c6c5e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::getMatchScore</definition>
+        <argsstring>(const str_t &amp;query, size_t first, std::vector&lt; str_t *&gt; &amp;targets, std::vector&lt; float &gt; &amp;currentScore)</argsstring>
+        <name>getMatchScore</name>
+        <param>
+          <type>const str_t &amp;</type>
+          <declname>query</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>first</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; str_t *&gt; &amp;</type>
+          <declname>targets</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; float &gt; &amp;</type>
+          <declname>currentScore</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>A looper to calculate match scores <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>query</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The query string. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>first</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The starting index to loop from. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>targets</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The target strings that have been scored </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>currentScore</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The score for each strings in <computeroutput>targets</computeroutput> </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="342" column="1" bodyfile="nGramSearch.cpp" bodystart="355" bodyend="368"/>
+        <referencedby refid="class_string_index_1a309f7697439fb3428de3c63dca6cdaa4" compoundref="n_gram_search_8cpp" startline="371" endline="384">StringIndex&lt; str_t &gt;::searchShort</referencedby>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a309f7697439fb3428de3c63dca6cdaa4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::searchShort</definition>
+        <argsstring>(str_t &amp;query, std::unordered_map&lt; str_t *, float &gt; &amp;score)</argsstring>
+        <name>searchShort</name>
+        <param>
+          <type>str_t &amp;</type>
+          <declname>query</declname>
+        </param>
+        <param>
+          <type>std::unordered_map&lt; str_t *, float &gt; &amp;</type>
+          <declname>score</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Search in the shortLib <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>query</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The query string. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>score</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Targets found paired with their corresponding cores generated. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="349" column="1" bodyfile="nGramSearch.cpp" bodystart="371" bodyend="384"/>
+        <references refid="class_string_index_1a32f2294a19ad5360bd62f1ede07c6c5e" compoundref="n_gram_search_8cpp" startline="355" endline="368">StringIndex&lt; str_t &gt;::getMatchScore</references>
+        <referencedby refid="class_string_index_1adedd1463c2745dcd1e36ee672f6a6613" compoundref="n_gram_search_8cpp" startline="451" endline="516">StringIndex&lt; str_t &gt;::_search</referencedby>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a80ddf83f3f207004142458317609c6d6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::searchLong</definition>
+        <argsstring>(str_t &amp;query, std::unordered_map&lt; str_t *, float &gt; &amp;score)</argsstring>
+        <name>searchLong</name>
+        <param>
+          <type>str_t &amp;</type>
+          <declname>query</declname>
+        </param>
+        <param>
+          <type>std::unordered_map&lt; str_t *, float &gt; &amp;</type>
+          <declname>score</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Search in the longLib <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>query</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The query string. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>score</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Targets found paired with their corresponding cores generated. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="356" column="1" bodyfile="nGramSearch.cpp" bodystart="394" bodyend="448"/>
+        <referencedby refid="class_string_index_1adedd1463c2745dcd1e36ee672f6a6613" compoundref="n_gram_search_8cpp" startline="451" endline="516">StringIndex&lt; str_t &gt;::_search</referencedby>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1adedd1463c2745dcd1e36ee672f6a6613" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::_search</definition>
+        <argsstring>(const char_t *query, const float threshold, const uint32_t limit, std::vector&lt; str_t &gt; &amp;result)</argsstring>
+        <name>_search</name>
+        <param>
+          <type>const <ref refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" kindref="member">char_t</ref> *</type>
+          <declname>query</declname>
+        </param>
+        <param>
+          <type>const float</type>
+          <declname>threshold</declname>
+        </param>
+        <param>
+          <type>const uint32_t</type>
+          <declname>limit</declname>
+        </param>
+        <param>
+          <type>std::vector&lt; str_t &gt; &amp;</type>
+          <declname>result</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The worker function for search <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>query</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The query string. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Lowest acceptable match ratio for a string to be included in the results. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>limit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The maximum number of results to generate. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>result</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The matching strings to be selected, sorted from highest score to lowest. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="365" column="1" bodyfile="nGramSearch.cpp" bodystart="451" bodyend="516"/>
+        <references refid="class_string_index_1a309f7697439fb3428de3c63dca6cdaa4" compoundref="n_gram_search_8cpp" startline="371" endline="384">StringIndex&lt; str_t &gt;::searchShort</references>
+        <references refid="class_string_index_1a80ddf83f3f207004142458317609c6d6" compoundref="n_gram_search_8cpp" startline="394" endline="448">StringIndex&lt; str_t &gt;::searchLong</references>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1aa11036396dce714b8c383564ffeaac70" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::search</definition>
+        <argsstring>(const char_t *query, char_t ***results, uint32_t *size, const float threshold, uint32_t limit)</argsstring>
+        <name>search</name>
+        <param>
+          <type>const <ref refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" kindref="member">char_t</ref> *</type>
+          <declname>query</declname>
+        </param>
+        <param>
+          <type><ref refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" kindref="member">char_t</ref> ***</type>
+          <declname>results</declname>
+        </param>
+        <param>
+          <type>uint32_t *</type>
+          <declname>size</declname>
+        </param>
+        <param>
+          <type>const float</type>
+          <declname>threshold</declname>
+        </param>
+        <param>
+          <type>uint32_t</type>
+          <declname>limit</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The search interface function, calls <computeroutput>_search</computeroutput> <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>query</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The query string. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>results</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The matching strings to be selected, sorted from highest score to lowest. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>size</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The number of strings in the result array. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>threshold</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Lowest acceptable match ratio for a string to be included in the results. </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>limit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The maximum number of results to generate. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="375" column="1" bodyfile="nGramSearch.cpp" bodystart="519" bodyend="542"/>
+        <references refid="n_gram_search_8cpp_1ad55ada7f4591fa63653a5ab560568037" compoundref="n_gram_search_8cpp" startline="9">indexed</references>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a014f9cc45c6e06aa25b04186c89ec032" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void StringIndex&lt; str_t &gt;::release</definition>
+        <argsstring>(char_t ***results, size_t size) const</argsstring>
+        <name>release</name>
+        <param>
+          <type><ref refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" kindref="member">char_t</ref> ***</type>
+          <declname>results</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Release a result pointer that have been generated in <computeroutput>search</computeroutput> <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>results</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The matching strings to be selected, allocated using the <computeroutput>new</computeroutput> operator. </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="381" column="1" bodyfile="nGramSearch.cpp" bodystart="545" bodyend="553"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1a95acf789f43ead39b067d1c82d3a9b02" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t StringIndex&lt; str_t &gt;::size</definition>
+        <argsstring>()</argsstring>
+        <name>size</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the size of the word map <computeroutput>wordMap</computeroutput> </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="386" column="1" bodyfile="nGramSearch.cpp" bodystart="556" bodyend="559"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1af92d29d09732cbf9104cc7e942859976" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t StringIndex&lt; str_t &gt;::libSize</definition>
+        <argsstring>()</argsstring>
+        <name>libSize</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the size of the n-gram library <computeroutput>ngrams</computeroutput> </para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="391" column="1" bodyfile="nGramSearch.cpp" bodystart="562" bodyend="565"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="class_string_index_1ab9646ee784190f04dba8d1e245c6be18" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class str_t</type>
+          </param>
+        </templateparamlist>
+        <type>bool</type>
+        <definition>static bool StringIndex&lt; str_t &gt;::compareScores</definition>
+        <argsstring>(std::pair&lt; str_t, float &gt; &amp;a, std::pair&lt; str_t, float &gt; &amp;b)</argsstring>
+        <name>compareScores</name>
+        <param>
+          <type>std::pair&lt; str_t, float &gt; &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>std::pair&lt; str_t, float &gt; &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Compare pairs of string-score by their score, and length. Greater scores and shorter lengths will be prioritized <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The first pair of string-score </para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>b</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The second pair of string-score </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="399" column="1" bodyfile="nGramSearch.h" bodystart="399" bodyend="406"/>
+      </memberdef>
+      <memberdef kind="function" id="class_string_index_1ac75c72953237b8361e7f35fe952657c4" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class str_t</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>static void StringIndex&lt; str_t &gt;::trim</definition>
+        <argsstring>(str_t &amp;s)</argsstring>
+        <name>trim</name>
+        <param>
+          <type>str_t &amp;</type>
+          <declname>s</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Trim a string from both ends (in place) <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>s</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The string to be trimmed </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="nGramSearch.h" line="413" column="1" bodyfile="nGramSearch.h" bodystart="413" bodyend="417"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="class_string_index" kindref="compound">StringIndex</ref>: Each instance manages a library from the &lt;index&gt; function <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>str_t</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A STL string type. Can be std::string or std::wstring </para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>    </detaileddescription>
+    <location file="nGramSearch.h" line="262" column="1" bodyfile="nGramSearch.h" bodystart="261" bodyend="444"/>
+    <listofallmembers>
+      <member refid="class_string_index_1adedd1463c2745dcd1e36ee672f6a6613" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>_search</name></member>
+      <member refid="class_string_index_1a7e326eb6fe367a6758c21aefbf64fe51" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>buildGrams</name></member>
+      <member refid="class_string_index_1a47f131c73d15a7c10c10a9748adf45dc" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>char_t</name></member>
+      <member refid="class_string_index_1ab9646ee784190f04dba8d1e245c6be18" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>compareScores</name></member>
+      <member refid="class_string_index_1a3b9f3efd8c61c708861b4161dd88038a" prot="private" virt="non-virtual"><scope>StringIndex</scope><name>distanceFactor</name></member>
+      <member refid="class_string_index_1a924cd52b4e055853db22f89e73f71fce" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>getGrams</name></member>
+      <member refid="class_string_index_1a1b66797dae7f0f1d4f3cf830dfeee869" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>getGrams</name></member>
+      <member refid="class_string_index_1a32f2294a19ad5360bd62f1ede07c6c5e" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>getMatchScore</name></member>
+      <member refid="class_string_index_1aadcaf2dd0a288b18d85febf8157de6be" prot="protected" virt="non-virtual"><scope>StringIndex</scope><name>gramSize</name></member>
+      <member refid="class_string_index_1ad52e11abab57f0175d9da8e22d602464" prot="private" virt="non-virtual"><scope>StringIndex</scope><name>indexed</name></member>
+      <member refid="class_string_index_1a56c849706990da23bb621522da959fa9" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>init</name></member>
+      <member refid="class_string_index_1af92d29d09732cbf9104cc7e942859976" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>libSize</name></member>
+      <member refid="class_string_index_1ac41713b30c0c373a3e9fc3efe13f9949" prot="protected" virt="non-virtual"><scope>StringIndex</scope><name>longLib</name></member>
+      <member refid="class_string_index_1adae09412441dcac487fd942660ca72f5" prot="protected" virt="non-virtual"><scope>StringIndex</scope><name>ngrams</name></member>
+      <member refid="class_string_index_1a014f9cc45c6e06aa25b04186c89ec032" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>release</name></member>
+      <member refid="class_string_index_1aa11036396dce714b8c383564ffeaac70" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>search</name></member>
+      <member refid="class_string_index_1a80ddf83f3f207004142458317609c6d6" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>searchLong</name></member>
+      <member refid="class_string_index_1a309f7697439fb3428de3c63dca6cdaa4" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>searchShort</name></member>
+      <member refid="class_string_index_1a7dade98e0cf386cbb8ab704421412f15" prot="private" virt="non-virtual"><scope>StringIndex</scope><name>sectionSize</name></member>
+      <member refid="class_string_index_1a4f0c00d4ace341b657ac1b233b70534b" prot="protected" virt="non-virtual"><scope>StringIndex</scope><name>shortLib</name></member>
+      <member refid="class_string_index_1a95acf789f43ead39b067d1c82d3a9b02" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>size</name></member>
+      <member refid="class_string_index_1aec0c7112ef81d953265033f9a779730f" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>StringIndex</name></member>
+      <member refid="class_string_index_1a2e323737994e475a5e5b6ccc9f631fff" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>StringIndex</name></member>
+      <member refid="class_string_index_1ab7114eb0acf9e736de851487398a4cef" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>StringIndex</name></member>
+      <member refid="class_string_index_1a97835599308c1e5feb47323545584dfd" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>stringMatch</name></member>
+      <member refid="class_string_index_1ac75c72953237b8361e7f35fe952657c4" prot="public" virt="non-virtual"><scope>StringIndex</scope><name>trim</name></member>
+      <member refid="class_string_index_1aaf98238698a0294638fb474c4962eac7" prot="protected" virt="non-virtual"><scope>StringIndex</scope><name>wordMap</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
