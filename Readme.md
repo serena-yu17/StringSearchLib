@@ -212,13 +212,22 @@ wide string version.
 
 ---
 
-##Usage:
-if (!unicode)
-    index(guid, words, size, rowSize, weight, gramSize);
-else
-    indexW(guid, words, size, rowSize, weight, gramSize);
+## Usage:
 
 if (!unicode)
-    search(guid, query, pResult, pCount, threshold, limit);
+
+    index(guid, words, size, rowSize, weight, gramSize);
+
 else
+
+    indexW(guid, words, size, rowSize, weight, gramSize);
+
+
+
+if (!unicode)
+
+    search(guid, query, pResult, pCount, threshold, limit);
+
+else
+
     searchW(guid, query, pResult, pCount, threshold, limit);
