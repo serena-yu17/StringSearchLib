@@ -1,6 +1,26 @@
 # This project is a C++ fuzzy string search library based on the n-gram algorithm.
 
+---
+---
 
+## Usage:
+
+```
+if (!unicode)
+    index(guid, words, size, rowSize, weight, gramSize);
+else
+    indexW(guid, words, size, rowSize, weight, gramSize);
+```
+
+```
+if (!unicode)
+    search(guid, query, pResult, pCount, threshold, limit);
+else
+    searchW(guid, query, pResult, pCount, threshold, limit);
+```
+
+---
+---
 
 ## DLL Interface:
 
@@ -20,7 +40,7 @@
 
 `weight` A list of the relative weight of each key. Default 1 for all
 
-
+---
 
 #### Index the library based on a string array of key, and another array of additional text, e.g. description.
 
@@ -42,7 +62,7 @@ In a search, all queries of the words in a row will return the master key.
 
 `gSize` size of grams to be created. Default 3.
 
-
+---
 
 #### Index the library based on a string array of key, and another array of additional text, e.g. description.
 
@@ -64,7 +84,7 @@ In a search, all queries of the words in a row will return the master key.
 
 `gSize` size of grams to be created. Default 3.
 
-
+---
 
 #### Index the library based on a string array of key, and another array of additional text, e.g. description.
 
@@ -88,7 +108,7 @@ In a search, all queries of the words in a row will return the master key.
 
 `gSize` size of grams to be created. Default 3.
 
-
+---
 
 #### Search the query in the indexed library identified by the guid.
 
@@ -108,7 +128,7 @@ Must call `release` to clean up after use.
 
 `limit` Maximum results generated
 
-
+---
 
 #### Search the query in the indexed library identified by the guid.
 
@@ -130,7 +150,7 @@ Must call `releaseW` to clean up after use.
 
 `limit` Maximum results generated
 
-
+---
 
 #### To release the memory allocated for the result in the `search` function
 
@@ -142,8 +162,7 @@ Must call `releaseW` to clean up after use.
 
 `size` Length of `result`
 
-
-
+---
 #### To release the memory allocated for the result in the <search> function.
 
 Wide string version.
@@ -156,7 +175,7 @@ Wide string version.
 
 `size` Length of `result`
 
-
+---
 
 #### To dispose a library indexed. If the library does not exist, `dispose will ignore it.
 
@@ -164,7 +183,7 @@ Wide string version.
 
 `guid` A unique id for the indexed library
 
-
+---
 
 #### To dispose a library indexed. If the library does not exist, `dispose will ignore it.
 
@@ -174,7 +193,7 @@ Wide string version.
 
 `guid` A unique id for the indexed library
 
-
+---
 
 #### To obtain the current word map size
 
@@ -182,7 +201,7 @@ Wide string version.
 
 `guid` A unique id for the indexed library
 
-
+---
 
 #### To obtain the current word map size
 
@@ -192,7 +211,7 @@ Wide string version.
 
 `guid` A unique id for the indexed library
 
-
+---
 
 #### To obtain the current n-gram library size.
 
@@ -200,7 +219,7 @@ Wide string version.
 
 `guid` A unique id for the indexed library
 
-
+---
 
 #### To obtain the current n-gram library size.
 
@@ -209,21 +228,3 @@ Wide string version.
 wide string version.
 
 `guid` A unique id for the indexed library
-
----
-
-## Usage:
-
-```
-if (!unicode)
-    index(guid, words, size, rowSize, weight, gramSize);
-else
-    indexW(guid, words, size, rowSize, weight, gramSize);
-```
-
-```
-if (!unicode)
-    search(guid, query, pResult, pCount, threshold, limit);
-else
-    searchW(guid, query, pResult, pCount, threshold, limit);
-```
