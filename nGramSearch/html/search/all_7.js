@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['release',['release',['../class_string_index.html#a014f9cc45c6e06aa25b04186c89ec032',1,'StringIndex']]]
+  ['mainlock',['mainLock',['../n_gram_search_8cpp.html#aa54d9680f7a2ed413c7a1bb5c4f13a3a',1,'nGramSearch.cpp']]]
 ];

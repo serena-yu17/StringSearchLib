@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['getgrams',['getGrams',['../class_string_index.html#a924cd52b4e055853db22f89e73f71fce',1,'StringIndex::getGrams(str_t *str)'],['../class_string_index.html#a1b66797dae7f0f1d4f3cf830dfeee869',1,'StringIndex::getGrams(const str_t &amp;str, std::vector&lt; str_t &gt; &amp;generatedGrams)']]],
-  ['getmatchscore',['getMatchScore',['../class_string_index.html#a32f2294a19ad5360bd62f1ede07c6c5e',1,'StringIndex']]],
-  ['gramsize',['gramSize',['../class_string_index.html#aadcaf2dd0a288b18d85febf8157de6be',1,'StringIndex']]]
+  ['dispose',['dispose',['../n_gram_search_8cpp.html#aaaf853ea1e0eb3fed9dfe80ebcf1bd13',1,'dispose(char *const guid):&#160;nGramSearch.cpp'],['../n_gram_search_8h.html#aaaf853ea1e0eb3fed9dfe80ebcf1bd13',1,'dispose(char *const guid):&#160;nGramSearch.cpp']]],
+  ['disposew',['disposeW',['../n_gram_search_8cpp.html#ae608fed7c79e70f7f22fcacd54598422',1,'disposeW(char *const guid):&#160;nGramSearch.cpp'],['../n_gram_search_8h.html#ae608fed7c79e70f7f22fcacd54598422',1,'disposeW(char *const guid):&#160;nGramSearch.cpp']]],
+  ['dllexp',['DLLEXP',['../n_gram_search_8h.html#aac43065921bf748ac6d1050bb5d2f2ea',1,'nGramSearch.h']]],
+  ['dllmain',['DllMain',['../dllmain_8cpp.html#a26e64fb39b69bcd9d1274d279f1561b9',1,'dllmain.cpp']]],
+  ['dllmain_2ecpp',['dllmain.cpp',['../dllmain_8cpp.html',1,'']]]
 ];

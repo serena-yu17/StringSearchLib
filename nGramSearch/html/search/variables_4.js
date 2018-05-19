@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wordmap',['wordMap',['../class_string_index.html#aaf98238698a0294638fb474c4962eac7',1,'StringIndex']]]
+  ['ngrams',['ngrams',['../class_string_index.html#adae09412441dcac487fd942660ca72f5',1,'StringIndex']]]
 ];
