@@ -209,3 +209,16 @@ Wide string version.
 wide string version.
 
 `guid` A unique id for the indexed library
+
+---
+
+##Usage:
+if (!unicode)
+    index(guid, words, size, rowSize, weight, gramSize);
+else
+    indexW(guid, words, size, rowSize, weight, gramSize);
+
+if (!unicode)
+    search(guid, query, pResult, pCount, threshold, limit);
+else
+    searchW(guid, query, pResult, pCount, threshold, limit);
