@@ -306,10 +306,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="nGramSearch.h" />
+    <ClInclude Include="nGramSearch.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="nGramSearch.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
