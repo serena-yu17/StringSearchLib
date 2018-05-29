@@ -224,7 +224,7 @@ public:
 	*/
 	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);
 
-	void calcScore(std::unordered_map<str_t*, float>& entryScore, std::unordered_map<str_t*, float>& scoreList, const float threshold);
+	void calcScore(std::unordered_map<str_t, float>& entryScore, std::unordered_map<str_t*, float>& scoreList, const float threshold);
 
 	/*!
 	The worker function for search
@@ -233,7 +233,7 @@ public:
 	@param limit The maximum number of results to generate.
 	@param result The matching strings to be selected, sorted from highest score to lowest.
 	*/
-	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t*>& result);
+	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
 
 	/*!
 	The search interface function, calls \p _search
@@ -267,13 +267,13 @@ public:
 	@param b The second pair of string-score
 	*/
 	template<class str_t>
-	static inline bool compareScores(std::pair<str_t*, float>& a, std::pair<str_t*, float>& b)
+	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
 	{
 		if (a.second > b.second)
 			return true;
 		if (a.second < b.second)
 			return false;
-		return a.first->size() < b.first->size();
+		return a.first.size() < b.first.size();
 	}
 
 	/*!
@@ -295,7 +295,7 @@ protected:
 	std::vector<str_t> shortLib;
 
 	//! All words, mapped to their master keys. A search result will always be redirected to its master keys
-	std::unordered_map<str_t*, std::vector<str_t*>> wordMap;
+	std::unordered_map<str_t*, std::vector<str_t>> wordMap;
 
 	//! Weights to keys
 	std::unordered_map<str_t*, float> wordWeight;
