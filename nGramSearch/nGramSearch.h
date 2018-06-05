@@ -172,7 +172,7 @@ public:
 	@param tempWordMap A temprary word map of strings. 
 	Key: query terms. Value: a list of master keys and corresponding scores that the queries point to.
 	*/
-	void init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap, std::unordered_map<str_t, float>& tempKeyScore);
+	void init(std::unordered_map<str_t, std::unordered_set<str_t>>& tempWordMap, std::unordered_map<str_t, float>& tempKeyScore);
 
 	/*!
 	Generate n-grams from a string based on the member variable \p gramSize.
