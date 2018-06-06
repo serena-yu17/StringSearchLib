@@ -120,7 +120,7 @@ namespace
 			}
 		}
 	}
-}
+}		   
 
 /*!
 StringIndex: Each instance manages a library from the <index> function
@@ -172,7 +172,7 @@ public:
 	@param tempWordMap A temprary word map of strings. 
 	Key: query terms. Value: a list of master keys and corresponding scores that the queries point to.
 	*/
-	void init(std::unordered_map<str_t, std::unordered_set<str_t>>& tempWordMap, std::unordered_map<str_t, float>& tempKeyScore);
+	void init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap, std::unordered_map<str_t, std::unordered_map<str_t, float>>& tempKeyScore);
 
 	/*!
 	Generate n-grams from a string based on the member variable \p gramSize.
@@ -224,7 +224,7 @@ public:
 	*/
 	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);
 
-	void calcScore(std::unordered_map<str_t, float>& entryScore, std::unordered_map<str_t*, float>& scoreList, const float threshold);
+	void calcScore(std::unordered_map<str_t*, float>& entryScore, std::unordered_map<str_t*, float>& scoreList, const float threshold);
 
 	/*!
 	The worker function for search
@@ -233,7 +233,7 @@ public:
 	@param limit The maximum number of results to generate.
 	@param result The matching strings to be selected, sorted from highest score to lowest.
 	*/
-	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t>& result);
+	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t*>& result);
 
 	/*!
 	The search interface function, calls \p _search
@@ -267,13 +267,13 @@ public:
 	@param b The second pair of string-score
 	*/
 	template<class str_t>
-	static inline bool compareScores(std::pair<str_t, float>& a, std::pair<str_t, float>& b)
+	static inline bool compareScores(std::pair<str_t*, float>& a, std::pair<str_t*, float>& b)
 	{
 		if (a.second > b.second)
 			return true;
 		if (a.second < b.second)
 			return false;
-		return a.first.size() < b.first.size();
+		return a.first->size() < b.first->size();
 	}
 
 	/*!
@@ -287,18 +287,20 @@ public:
 		rtrim(s);
 	}
 
-protected:
+private:
+	std::vector<str_t> stringLib;
+
 	//! The library for all words that have a length >= \p gramSize * 2
-	std::vector<str_t> longLib;
+	std::vector<str_t*> longLib;
 
 	//! The library for all words that have a length < \p gramSize * 2
-	std::vector<str_t> shortLib;
+	std::vector<str_t*> shortLib;
 
 	//! All words, mapped to their master keys. A search result will always be redirected to its master keys
-	std::unordered_map<str_t*, std::vector<str_t>> wordMap;
+	std::unordered_map<str_t*, std::vector<str_t*>> wordMap;
 
 	//! Weights to keys
-	std::unordered_map<str_t*, float> wordWeight;
+	std::unordered_map<str_t*, std::unordered_map<str_t*, float>> wordWeight;
 
 	//! The n-gram library generated
 	std::unordered_map<str_t, std::unordered_set<str_t*>> ngrams;
@@ -306,7 +308,6 @@ protected:
 	//! the size of n-grams
 	int16_t gramSize = 3;
 
-private:
 	//! The section size of strings for each \p getMatchScore loop block
 	size_t sectionSize = 1000;
 
