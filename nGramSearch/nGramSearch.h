@@ -131,7 +131,7 @@ class StringIndex
 {
 public:
 	//! The character type contained in the str_t
-	typedef typename str_t::value_type char_t;
+	using char_t = typename str_t::value_type;
 
 	/*!
 	Constructs the StringIndex class by indexing the strings based on an array of words
