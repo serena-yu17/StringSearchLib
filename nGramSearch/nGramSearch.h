@@ -120,7 +120,7 @@ namespace
 			}
 		}
 	}
-}		   
+}
 
 /*!
 StringIndex: Each instance manages a library from the <index> function
@@ -178,7 +178,7 @@ public:
 	Generate n-grams from a string based on the member variable \p gramSize.
 	@param str A pointer to the string to generate n-grams from.
 	*/
-	void getGrams(str_t* str);
+	void getGrams(size_t id);
 
 	/*!
 	Generate n-grams from a string based on the member variable \p gramSize, and store in an array.
@@ -208,23 +208,23 @@ public:
 	@param targets The target strings that have been scored
 	@param currentScore The score for each strings in \p targets
 	*/
-	void getMatchScore(const str_t& query, size_t first, std::vector<str_t*>& targets, std::vector<float>& currentScore); 
+	void getMatchScore(const str_t& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore); 
 
 	/*!
 	Search in the shortLib
 	@param query The query string.
 	@param score Targets found paired with their corresponding cores generated.
 	*/
-	void searchShort(str_t& query, std::unordered_map<str_t*, float>& score);  
+	void searchShort(str_t& query, std::unordered_map<size_t, float>& score);
 
 	/*!
 	Search in the longLib
 	@param query The query string.
 	@param score Targets found paired with their corresponding cores generated.
 	*/
-	void searchLong(str_t& query, std::unordered_map<str_t*, float>& score);
+	void searchLong(str_t& query, std::unordered_map<size_t, float>& score);
 
-	void calcScore(std::unordered_map<str_t*, float>& entryScore, std::unordered_map<str_t*, float>& scoreList, const float threshold);
+	void calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold);
 
 	/*!
 	The worker function for search
@@ -233,7 +233,7 @@ public:
 	@param limit The maximum number of results to generate.
 	@param result The matching strings to be selected, sorted from highest score to lowest.
 	*/
-	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<str_t*>& result);
+	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<size_t>& result);
 
 	/*!
 	The search interface function, calls \p _search
@@ -259,22 +259,7 @@ public:
 	/*!
 	Get the size of the n-gram library \p ngrams
 	*/
-	uint64_t libSize();
-
-	/*!
-	Compare pairs of string-score by their score, and length. Greater scores and shorter lengths will be prioritized
-	@param a The first pair of string-score
-	@param b The second pair of string-score
-	*/
-	template<class str_t>
-	static inline bool compareScores(std::pair<str_t*, float>& a, std::pair<str_t*, float>& b)
-	{
-		if (a.second > b.second)
-			return true;
-		if (a.second < b.second)
-			return false;
-		return a.first->size() < b.first->size();
-	}
+	uint64_t libSize();	
 
 	/*!
 	Trim a string from both ends (in place)
@@ -287,23 +272,48 @@ public:
 		rtrim(s);
 	}
 
+
+	template<class str_t>
+	struct ScoreComparer
+	{
+	public:
+		const std::vector<str_t>& stringLib;
+
+		ScoreComparer(const StringIndex<str_t>& instance) : stringLib(instance.stringLib)
+		{ }
+
+		/*!
+		Compare pairs of string-score by their score, and length. Greater scores and shorter lengths will be prioritized
+		@param a The first pair of string-score
+		@param b The second pair of string-score
+		*/
+		bool operator()(const std::pair<size_t, float>& a, const std::pair<size_t, float>& b) const
+		{
+			if (a.second > b.second)
+				return true;
+			if (a.second < b.second)
+				return false;
+			return stringLib[a.first].size() < stringLib[b.first].size();
+		}
+	};
+
 private:
 	std::vector<str_t> stringLib;
 
 	//! The library for all words that have a length >= \p gramSize * 2
-	std::vector<str_t*> longLib;
+	std::vector<size_t> longLib;
 
 	//! The library for all words that have a length < \p gramSize * 2
-	std::vector<str_t*> shortLib;
+	std::vector<size_t> shortLib;
 
 	//! All words, mapped to their master keys. A search result will always be redirected to its master keys
-	std::unordered_map<str_t*, std::vector<str_t*>> wordMap;
+	std::unordered_map<size_t, std::vector<size_t>> wordMap;
 
 	//! Weights to keys
-	std::unordered_map<str_t*, std::unordered_map<str_t*, float>> wordWeight;
+	std::unordered_map<size_t, std::unordered_map<size_t, float>> wordWeight;
 
 	//! The n-gram library generated
-	std::unordered_map<str_t, std::unordered_set<str_t*>> ngrams;
+	std::unordered_map<str_t, std::unordered_set<size_t>> ngrams;
 
 	//! the size of n-grams
 	int16_t gramSize = 3;
@@ -316,6 +326,8 @@ private:
 
 	//! deprecated
 	const float distanceFactor = 0.2f;
-};		 
+};
+
+
 #endif
 
