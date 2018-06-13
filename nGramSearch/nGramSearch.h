@@ -319,7 +319,9 @@ private:
 	int16_t gramSize = 3;
 
 	//! The section size of strings for each \p getMatchScore loop block
-	size_t sectionSize = 1000;
+	size_t sectionSizeShort = 1000;
+	size_t sectionSizeLong = 1000;
+	size_t longest = 0;
 
 	//! Indicator of whether the library has been indexed. If not indexed, no search can be done.
 	std::atomic<bool> indexed = false;
