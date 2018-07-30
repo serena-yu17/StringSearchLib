@@ -18,16 +18,22 @@
 #include <atomic>
 #include <cmath>
 
+#undef max
+#undef min
+#define max(a, b) a > b ? a : b
+#define min(a, b) a < b ? a : b
+
+
 namespace
 {
 	//!Allowed words for the query string. Other characters in the ASCII range will be converted to spaces
 	const std::unordered_set<char> wordChar
 	({
 		'.','%','$',' ', '@',
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 		'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-	});
+		});
 
 	/*!
 	Trims spaces in place from left of string
@@ -82,7 +88,7 @@ namespace
 	}
 
 	/*!
-	Converts the string to upper case in place. 
+	Converts the string to upper case in place.
 	Wide string version.
 	@param str String to be converted
 	*/
@@ -90,11 +96,11 @@ namespace
 	{
 		for (wchar_t& ch : str)
 			ch = towupper(ch);
-	} 
+	}
 
 	/*!
 	Escapes all invalid characters to spaces
-	@param str String to be converted 
+	@param str String to be converted
 	*/
 	inline void escapeBlank(std::string& str)
 	{
@@ -135,7 +141,7 @@ public:
 
 	/*!
 	Constructs the StringIndex class by indexing the strings based on an array of words
-	@param words Words to be searched for. For each row, the first word is used as the master key, in which the row size is \p rowSize. 
+	@param words Words to be searched for. For each row, the first word is used as the master key, in which the row size is \p rowSize.
 	All rows are flattened into a 1D-array, and can be extracted based on \p rowSize.
 	In a search, all queries of the words in a row will return the master key.
 	@param size size of the \p words
@@ -165,11 +171,11 @@ public:
 	@param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
 	@param gSize size of grams to be created. Default 3.
 	*/
-	StringIndex(std::vector<std::vector<str_t>>& words, const int16_t gSize, std::vector<std::vector<float>>& weight);		
+	StringIndex(std::vector<std::vector<str_t>>& words, const int16_t gSize, std::vector<std::vector<float>>& weight);
 
 	/*!
 	Initiates the word map by assigning the same strings to a pointer, to save space.
-	@param tempWordMap A temprary word map of strings. 
+	@param tempWordMap A temprary word map of strings.
 	Key: query terms. Value: a list of master keys and corresponding scores that the queries point to.
 	*/
 	void init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap, std::unordered_map<str_t, std::unordered_map<str_t, float>>& tempKeyScore);
@@ -193,7 +199,7 @@ public:
 	void buildGrams();
 
 	/*!
-	Computes the percentage of \p query matches \p source. 
+	Computes the percentage of \p query matches \p source.
 	@param query A query string
 	@param source A source string in the library to compare to.
 	@param row1 A temporary vector as a cache for the algorithm. Its size must at least (the max size of \p query and \p source) + 1.
@@ -208,7 +214,7 @@ public:
 	@param targets The target strings that have been scored
 	@param currentScore The score for each strings in \p targets
 	*/
-	void getMatchScore(const str_t& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore); 
+	void getMatchScore(const str_t& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore);
 
 	/*!
 	Search in the shortLib
@@ -241,7 +247,7 @@ public:
 	@param results The matching strings to be selected, sorted from highest score to lowest.
 	@param size The number of strings in the result array.
 	@param threshold Lowest acceptable match ratio for a string to be included in the results.
-	@param limit The maximum number of results to generate.	
+	@param limit The maximum number of results to generate.
 	*/
 	void search(const char_t* query, char_t*** results, uint32_t* size, const float threshold, uint32_t limit);
 
@@ -259,21 +265,18 @@ public:
 	/*!
 	Get the size of the n-gram library \p ngrams
 	*/
-	uint64_t libSize();	
+	uint64_t libSize();
 
 	/*!
 	Trim a string from both ends (in place)
 	@param s The string to be trimmed
 	*/
-	template<class str_t>
-	static inline void trim(str_t &s) 
+	void trim(str_t &s)
 	{
 		ltrim(s);
 		rtrim(s);
 	}
 
-
-	template<class str_t>
 	struct ScoreComparer
 	{
 	public:
@@ -324,7 +327,7 @@ private:
 	size_t longest = 0;
 
 	//! Indicator of whether the library has been indexed. If not indexed, no search can be done.
-	std::atomic<bool> indexed = false;
+	std::atomic<bool> indexed;
 
 	//! deprecated
 	const float distanceFactor = 0.2f;
