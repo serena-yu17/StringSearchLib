@@ -17,12 +17,10 @@
 #include <mutex>
 #include <atomic>
 #include <cmath>
+#include <algorithm>
 
 #undef max
 #undef min
-#define max(a, b) a > b ? a : b
-#define min(a, b) a < b ? a : b
-
 
 namespace
 {
