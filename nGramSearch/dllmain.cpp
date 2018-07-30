@@ -2,7 +2,19 @@
 #include "nGramSearch.h"
 #include "nGramSearch.hpp"
 
-#define DLLEXP extern "C" __declspec(dllexport)
+#if defined(_MSC_VER)
+    //  MSVC
+    #define DLLEXP extern "C" __declspec(dllexport)
+#elif defined(__GNUC__)
+    //  GCC
+    #define DLLEXP extern "C"  __attribute__((visibility("default")))
+#elif defined(__clang__)
+	//clang
+	#define DLLEXP extern "C"  __attribute__((visibility("default")))
+#else
+    #define DLLEXP extern "C"
+    #pragma warning Unknown dynamic link import/export semantics
+#endif
 
 using namespace std;
 
@@ -84,7 +96,7 @@ Must call \p release to clean up after use.
 @param threshold Lowest acceptable matching %, as a value between 0 and 1
 @param limit Maximum results generated
 */
-DLLEXP void search(char* const guid, const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit)
+DLLEXP uint32_t search(char* const guid, const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit)
 {
 	shared_lock<shared_timed_mutex> sharedLock(mainLock);
 	auto pkeyPair = indexed.find(string(guid));
@@ -92,8 +104,9 @@ DLLEXP void search(char* const guid, const char* query, char*** results, uint32_
 	{
 		auto& instance = pkeyPair->second;
 		//sharedLock.unlock();
-		instance->search(query, results, size, threshold, limit);
+		return instance->search(query, results, size, threshold, limit);
 	}
+	return 0;
 }
 
 /*!
@@ -107,7 +120,7 @@ Must call \p releaseW to clean up after use.
 @param threshold Lowest acceptable matching %, as a value between 0 and 1
 @param limit Maximum results generated
 */
-DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* size, const float threshold, uint32_t limit)
+DLLEXP uint32_t searchW(char* const guid, const wchar_t* query, wchar_t*** results, uint32_t* size, const float threshold, uint32_t limit)
 {
 	shared_lock<shared_timed_mutex> sharedLock(mainLock);
 	auto pkeyPair = indexedW.find(string(guid));
@@ -115,8 +128,9 @@ DLLEXP void searchW(char* const guid, const wchar_t* query, wchar_t*** results, 
 	{
 		auto& instance = pkeyPair->second;
 		//sharedLock.unlock();
-		instance->search(query, results, size, threshold, limit);
+		return instance->search(query, results, size, threshold, limit);
 	}
+	return 0;
 }
 
 /*!

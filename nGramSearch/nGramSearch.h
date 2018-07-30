@@ -1,4 +1,3 @@
-#pragma once
 #ifndef NGRAMSEARCH_H
 #define NGRAMSEARCH_H
 
@@ -11,13 +10,13 @@
 #include <unordered_set>
 #include <algorithm>
 #include <future>
-#include <intrin.h>
 #include <shared_mutex>
 #include <memory>
 #include <mutex>
 #include <atomic>
 #include <cmath>
 #include <algorithm>
+#include <cstring>
 
 #undef max
 #undef min
@@ -228,7 +227,7 @@ public:
 	*/
 	void searchLong(str_t& query, std::unordered_map<size_t, float>& score);
 
-	void calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold);
+	uint32_t calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold);
 
 	/*!
 	The worker function for search
@@ -237,7 +236,7 @@ public:
 	@param limit The maximum number of results to generate.
 	@param result The matching strings to be selected, sorted from highest score to lowest.
 	*/
-	void _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<size_t>& result);
+	uint32_t _search(const char_t* query, const float threshold, const uint32_t limit, std::vector<size_t>& result);
 
 	/*!
 	The search interface function, calls \p _search
@@ -247,7 +246,7 @@ public:
 	@param threshold Lowest acceptable match ratio for a string to be included in the results.
 	@param limit The maximum number of results to generate.
 	*/
-	void search(const char_t* query, char_t*** results, uint32_t* size, const float threshold, uint32_t limit);
+	uint32_t search(const char_t* query, char_t*** results, uint32_t* size, const float threshold, uint32_t limit);
 
 	/*!
 	Release a result pointer that have been generated in \p search
@@ -329,6 +328,8 @@ private:
 
 	//! deprecated
 	const float distanceFactor = 0.2f;
+
+	const float delta = 1E-4f;
 };
 
 
