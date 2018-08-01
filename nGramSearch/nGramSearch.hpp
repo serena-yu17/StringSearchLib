@@ -96,14 +96,18 @@ void StringSearch::StringIndex<str_t>::init(std::unordered_map<str_t, std::vecto
 template<class str_t>
 StringSearch::StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const uint16_t rowSize, float* const weight, const uint16_t gSize)
 {
-	if (gSize < 2 || size < 2)
+	if (gSize < 2 || size < 2 || !words)
 		return;
 	std::unordered_map<str_t, std::vector<str_t>> tempWordMap(size);
 	std::unordered_map<str_t, std::unordered_map<str_t, float>> tempWeightMap(size);
 	for (size_t i = 0; i < size; i += rowSize)
 	{
+		//skip null entries
+		if (!words[i])
+			continue;
 		str_t strKey(words[i]);
 		trim(strKey);
+		//skip empty entries
 		if (strKey.size() == 0)
 			continue;
 		str_t upperKey(strKey);
@@ -194,8 +198,12 @@ StringSearch::StringIndex<str_t>::StringIndex(char_t*** const words, const size_
 	std::unordered_map<str_t, std::unordered_map<str_t, float>> tempWeightMap(size);
 	for (size_t i = 0; i < size; i++)
 	{
+		//skip null entries
+		if (!words[i] || !words[i][0])
+			continue;
 		str_t strKey(words[i][0]);
 		trim(strKey);
+		//skip empty entries
 		if (strKey.size() == 0)
 			continue;
 		str_t upperKey(strKey);
