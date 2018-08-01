@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef NGRAMSEARCH_H
 #define NGRAMSEARCH_H
 
@@ -18,6 +20,8 @@
 #include <algorithm>
 #include <cstring>
 #include <vector>
+
+#include "ctpl_stl.h"
 
 #undef max
 #undef min
@@ -115,6 +119,8 @@ namespace StringSearch
 			}
 		}
 	}
+
+	ctpl::thread_pool thrdPool(std::thread::hardware_concurrency());
 
 
 	/*!
