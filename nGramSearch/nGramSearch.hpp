@@ -6,7 +6,7 @@
 #include "nGramSearch.h"
 
 template<class str_t>
-void StringIndex<str_t>::getGrams(size_t id)
+void StringSearch::StringIndex<str_t>::getGrams(size_t id)
 {
 	auto& str = stringLib[id];
 	for (size_t i = 0; i < str.size() - gramSize + 1; i++)
@@ -17,14 +17,14 @@ void StringIndex<str_t>::getGrams(size_t id)
 }
 
 template<class str_t>
-void StringIndex<str_t>::getGrams(const str_t& str, std::vector<str_t>& generatedGrams)
+void StringSearch::StringIndex<str_t>::getGrams(const str_t& str, std::vector<str_t>& generatedGrams)
 {
 	for (size_t i = 0; i < str.size() - gramSize + 1; i++)
 		generatedGrams.emplace_back(str.substr(i, gramSize));
 }
 
 template<class str_t>
-void StringIndex<str_t>::buildGrams()
+void StringSearch::StringIndex<str_t>::buildGrams()
 {
 	for (auto& id : longLib)
 		getGrams(id);
@@ -32,7 +32,7 @@ void StringIndex<str_t>::buildGrams()
 }
 
 template<class str_t>
-void StringIndex<str_t>::init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap,
+void StringSearch::StringIndex<str_t>::init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap,
 	std::unordered_map<str_t, std::unordered_map<str_t, float>>& tempWordWeight)
 {
 	//Centralize all strings in an array so that they do not take replicated spaces
@@ -94,7 +94,7 @@ void StringIndex<str_t>::init(std::unordered_map<str_t, std::vector<str_t>>& tem
 }
 
 template<class str_t>
-StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const uint16_t rowSize, float* const weight, const uint16_t gSize)
+StringSearch::StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const uint16_t rowSize, float* const weight, const uint16_t gSize)
 {
 	if (gSize < 2 || size < 2)
 		return;
@@ -107,7 +107,7 @@ StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const u
 		if (strKey.size() == 0)
 			continue;
 		str_t upperKey(strKey);
-		escapeBlank(upperKey);
+		escapeBlank(upperKey, validChar);
 		trim(upperKey);
 		toUpper(upperKey);
 
@@ -121,7 +121,7 @@ StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const u
 			if (words[j])
 			{
 				str_t strQuery(words[j]);
-				escapeBlank(strQuery);
+				escapeBlank(strQuery, validChar);
 				trim(strQuery);
 				toUpper(strQuery);
 				if (strQuery.size() != 0)
@@ -140,7 +140,7 @@ StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const u
 }
 
 template<class str_t>
-StringIndex<str_t>::StringIndex(std::vector<std::vector<str_t>>& words, const int16_t gSize, std::vector<std::vector<float>>& weight)
+StringSearch::StringIndex<str_t>::StringIndex(std::vector<std::vector<str_t>>& words, const int16_t gSize, std::vector<std::vector<float>>& weight)
 {
 	if (gSize < 2 || words.size() < 2)
 		return;
@@ -186,7 +186,7 @@ StringIndex<str_t>::StringIndex(std::vector<std::vector<str_t>>& words, const in
 }
 
 template<class str_t>
-StringIndex<str_t>::StringIndex(char_t*** const words, const size_t size, const uint16_t rowSize, float** weight, const uint16_t gSize)
+StringSearch::StringIndex<str_t>::StringIndex(char_t*** const words, const size_t size, const uint16_t rowSize, float** weight, const uint16_t gSize)
 {
 	if (gSize < 2 || size < 2)
 		return;
@@ -199,7 +199,7 @@ StringIndex<str_t>::StringIndex(char_t*** const words, const size_t size, const 
 		if (strKey.size() == 0)
 			continue;
 		str_t upperKey(strKey);
-		escapeBlank(upperKey);
+		escapeBlank(upperKey, validChar);
 		trim(upperKey);
 		toUpper(upperKey);
 
@@ -213,7 +213,7 @@ StringIndex<str_t>::StringIndex(char_t*** const words, const size_t size, const 
 			if (words[i][j])
 			{
 				str_t strQuery(words[i][j]);
-				escapeBlank(strQuery);
+				escapeBlank(strQuery, validChar);
 				trim(strQuery);
 				toUpper(strQuery);
 				if (strQuery.size() != 0)
@@ -233,7 +233,7 @@ StringIndex<str_t>::StringIndex(char_t*** const words, const size_t size, const 
 }
 
 template<class str_t>
-size_t StringIndex<str_t>::stringMatch(const str_t& query, const str_t& source, std::vector<size_t>& row1, std::vector<size_t>& row2)
+size_t StringSearch::StringIndex<str_t>::stringMatch(const str_t& query, const str_t& source, std::vector<size_t>& row1, std::vector<size_t>& row2)
 {
 	if (query.size() == 1)
 	{
@@ -275,7 +275,7 @@ size_t StringIndex<str_t>::stringMatch(const str_t& query, const str_t& source, 
 }
 
 template<class str_t>
-void StringIndex<str_t>::getMatchScore(const str_t& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore)
+void StringSearch::StringIndex<str_t>::getMatchScore(const str_t& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore)
 {
 	auto size = std::max(query.size() + 1, (size_t)gramSize * 2);
 	if (query.size() <= (size_t)gramSize)
@@ -302,7 +302,7 @@ void StringIndex<str_t>::getMatchScore(const str_t& query, size_t first, std::ve
 }
 
 template<class str_t>
-void StringIndex<str_t>::searchShort(str_t& query, std::unordered_map<size_t, float>& score)
+void StringSearch::StringIndex<str_t>::searchShort(str_t& query, std::unordered_map<size_t, float>& score)
 {
 	auto len = query.size();
 	auto dicSize = shortLib.size();
@@ -322,7 +322,7 @@ void StringIndex<str_t>::searchShort(str_t& query, std::unordered_map<size_t, fl
 
 
 template<class str_t>
-void StringIndex<str_t>::searchLong(str_t& query, std::unordered_map<size_t, float>& score)
+void StringSearch::StringIndex<str_t>::searchLong(str_t& query, std::unordered_map<size_t, float>& score)
 {
 	auto len = query.size();
 	if (len < (size_t)gramSize)
@@ -346,7 +346,7 @@ void StringIndex<str_t>::searchLong(str_t& query, std::unordered_map<size_t, flo
 }
 
 template<class str_t>
-uint32_t StringIndex<str_t>::calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold)
+uint32_t StringSearch::StringIndex<str_t>::calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold)
 {
 	uint32_t perfMatchCount = 0;
 	for (auto& scorePair : scoreList)
@@ -374,7 +374,7 @@ uint32_t StringIndex<str_t>::calcScore(std::unordered_map<size_t, float>& entryS
 }
 
 template<class str_t>
-uint32_t StringIndex<str_t>::_search(const char_t* query, const float threshold, const uint32_t limit, std::vector<size_t>& result)
+uint32_t StringSearch::StringIndex<str_t>::_search(const char_t* query, const float threshold, const uint32_t limit, std::vector<size_t>& result)
 {
 	str_t queryStr(query);
 	std::unordered_map<size_t, float> entryScore;
@@ -390,7 +390,7 @@ uint32_t StringIndex<str_t>::_search(const char_t* query, const float threshold,
 	}
 	else
 	{
-		escapeBlank(queryStr);
+		escapeBlank(queryStr, validChar);
 		trim(queryStr);
 		if (queryStr.size() == 0)
 			return 0;
@@ -432,7 +432,7 @@ uint32_t StringIndex<str_t>::_search(const char_t* query, const float threshold,
 }
 
 template<class str_t>
-uint32_t StringIndex<str_t>::search(const char_t* query, char_t*** results, uint32_t* size, const float threshold, uint32_t limit)
+uint32_t StringSearch::StringIndex<str_t>::search(const char_t* query, char_t*** results, uint32_t* size, const float threshold, uint32_t limit)
 {
 	if (!indexed)
 		return 0;
@@ -459,7 +459,7 @@ uint32_t StringIndex<str_t>::search(const char_t* query, char_t*** results, uint
 }
 
 template<class str_t>
-void StringIndex<str_t>::release(char_t*** results, size_t size) const
+void StringSearch::StringIndex<str_t>::release(char_t*** results, size_t size) const
 {
 	if (*results)
 	{
@@ -470,15 +470,21 @@ void StringIndex<str_t>::release(char_t*** results, size_t size) const
 }
 
 template<class str_t>
-uint64_t StringIndex<str_t>::size()
+uint64_t StringSearch::StringIndex<str_t>::size()
 {
 	return wordMap.size();
 }
 
 template<class str_t>
-uint64_t StringIndex<str_t>::libSize()
+uint64_t StringSearch::StringIndex<str_t>::libSize()
 {
 	return ngrams.size();
+}
+
+template<class str_t>
+void StringSearch::StringIndex<str_t>::setValidChar(std::unordered_set<char_t>& newValidChar)
+{
+	validChar = std::move(newValidChar);
 }
 
 #endif

@@ -3,20 +3,21 @@
 #include "nGramSearch.hpp"
 
 #if defined(_MSC_VER)
-    //  MSVC
-    #define DLLEXP extern "C" __declspec(dllexport)
+	//  MSVC
+#define DLLEXP extern "C" __declspec(dllexport)
 #elif defined(__GNUC__)
-    //  GCC
-    #define DLLEXP extern "C"  __attribute__((visibility("default")))
+	//  GCC
+#define DLLEXP extern "C"  __attribute__((visibility("default")))
 #elif defined(__clang__)
 	//clang
-	#define DLLEXP extern "C"  __attribute__((visibility("default")))
+#define DLLEXP extern "C"  __attribute__((visibility("default")))
 #else
-    #define DLLEXP extern "C"
-    #pragma warning Unknown dynamic link import/export semantics
+#define DLLEXP extern "C"
+#pragma warning Unknown dynamic link import/export semantics
 #endif
 
 using namespace std;
+using namespace StringSearch;
 
 shared_timed_mutex mainLock;
 //key entries for indexed StringIndex class instances
@@ -235,5 +236,27 @@ DLLEXP uint64_t getLibSizeW(char* const guid)
 	if (instance != indexedW.end())
 		return instance->second->libSize();
 	return 0;
+}
+
+DLLEXP void setValidChar(char* const guid, char* const characters, int n)
+{
+	std::unordered_set<char> newValidChar(n);
+	for (int i = 0; i < n; i++)
+		newValidChar.insert(characters[i]);
+	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	auto instance = indexed.find(string(guid));
+	if (instance != indexed.end())
+		instance->second->setValidChar(newValidChar);
+}
+
+DLLEXP void setValidCharW(char* const guid, wchar_t* const characters, int n)
+{
+	std::unordered_set<wchar_t> newValidChar(n);
+	for (int i = 0; i < n; i++)
+		newValidChar.insert(characters[i]);
+	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	auto instance = indexedW.find(string(guid));
+	if (instance != indexedW.end())
+		instance->second->setValidChar(newValidChar);
 }
 
