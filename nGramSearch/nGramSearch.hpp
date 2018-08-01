@@ -323,7 +323,7 @@ void StringSearch::StringIndex<str_t>::searchShort(str_t& query, std::unordered_
 	std::vector<std::future<void>> futures;
 	auto nThrd = std::thread::hardware_concurrency();
 	for (size_t section = 0; section < nThrd; section++)
-		futures.emplace_back(thrdPool.push([&](int id) {return getMatchScore(query, section, targets, currentScore); }));
+		futures.emplace_back(thrdPool.push([&, section](int id) {return getMatchScore(query, section, targets, currentScore); }));
 	for (auto& fu : futures)
 		fu.get();
 	for (size_t i = 0; i < dicSize; i++)
