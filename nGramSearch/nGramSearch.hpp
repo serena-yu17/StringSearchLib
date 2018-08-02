@@ -1,7 +1,5 @@
 // nGramSearch.cpp : Defines the exported functions for the DLL application.
 //
-#pragma once
-
 #ifndef NGRAMSEARCH_HPP
 #define NGRAMSEARCH_HPP
 
@@ -323,7 +321,7 @@ void StringSearch::StringIndex<str_t>::searchShort(str_t& query, std::unordered_
 	std::vector<std::future<void>> futures;
 	auto nThrd = std::thread::hardware_concurrency();
 	for (size_t section = 0; section < nThrd; section++)
-		futures.emplace_back(thrdPool.push([&, section](int id) {return getMatchScore(query, section, targets, currentScore); }));
+		futures.emplace_back(std::async(std::launch::async, &StringIndex::getMatchScore, this, std::cref(query), section, std::ref(targets), std::ref(currentScore)));
 	for (auto& fu : futures)
 		fu.get();
 	for (size_t i = 0; i < dicSize; i++)
@@ -411,12 +409,10 @@ uint32_t StringSearch::StringIndex<str_t>::_search(const char_t* query, const fl
 		//if the query is long, there is no need to search for short sequences.
 		if (queryStr.size() < (size_t)gramSize * 3)
 			futures.emplace_back(
-				StringSearch::thrdPool.push([&](int id) {return searchShort(queryStr, scoreShort); })
-				//std::async(std::launch::async, &StringIndex::searchShort, this, std::ref(queryStr), ref(scoreShort))
+				std::async(std::launch::async, &StringIndex::searchShort, this, std::ref(queryStr), ref(scoreShort))
 			);
 		futures.emplace_back(
-			StringSearch::thrdPool.push([&](int id) {return searchLong(queryStr, scoreLong); })
-			//std::async(std::launch::async, &StringIndex::searchLong, this, std::ref(queryStr), ref(scoreLong))
+			std::async(std::launch::async, &StringIndex::searchLong, this, std::ref(queryStr), ref(scoreLong))
 		);
 		for (auto& fu : futures)
 			fu.get();
