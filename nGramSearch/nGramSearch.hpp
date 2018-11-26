@@ -15,7 +15,7 @@ void StringSearch::StringIndex::getGrams(size_t id)
 	}
 }
 
-std::vector<int32_t> StringSearch::StringIndex::getGrams(const std::string& str)
+std::vector<int32_t> StringSearch::StringIndex::getGrams(const std::string& str) const
 {
 	std::vector<int32_t> generatedGrams;
 	generatedGrams.reserve(str.size() - 2);
@@ -233,7 +233,8 @@ StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, c
 	buildGrams();
 }
 
-size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source, std::vector<size_t>& row1, std::vector<size_t>& row2)
+size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source, 
+	std::vector<size_t>& row1, std::vector<size_t>& row2) const
 {
 	if (query.size() == 1)
 	{
@@ -274,7 +275,8 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 	return qSize - misMatch;
 }
 
-void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore)
+void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, 
+	std::vector<float>& currentScore) const
 {
 	auto size = std::max(query.size() + 1, (size_t)6);
 	if (query.size() <= 3)
@@ -300,7 +302,7 @@ void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t f
 		}
 }
 
-void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_map<size_t, float>& score)
+void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_map<size_t, float>& score) const
 {
 	auto len = query.size();
 	auto dicSize = shortLib.size();
@@ -318,7 +320,7 @@ void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_m
 		score[targets[i]] += currentScore[i];
 }
 
-void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_map<size_t, float>& score)
+void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_map<size_t, float>& score) const
 {
 	auto len = query.size();
 	if (len < (size_t)3)
@@ -331,7 +333,7 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 	//may consider parallelsm here in the future
 	for (auto& gram : generatedGrams)
 	{
-		const auto& sourceSet = ngrams[gram];
+		const auto& sourceSet = ngrams.find(gram)->second;
 		for (auto& match : sourceSet)
 			rawScore[match]++;
 	}
@@ -339,7 +341,8 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
-uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold)
+uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>& entryScore, 
+	std::unordered_map<size_t, float>& scoreList, const float threshold) const
 {
 	uint32_t perfMatchCount = 0;
 	for (auto& scorePair : scoreList)
@@ -366,7 +369,7 @@ uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>&
 	return perfMatchCount;
 }
 
-uint32_t StringSearch::StringIndex::_search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result)
+uint32_t StringSearch::StringIndex::_search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result) const
 {
 	std::string queryStr(query);
 	std::unordered_map<size_t, float> entryScore;
@@ -423,7 +426,7 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 	return perfMatchCount;
 }
 
-uint32_t StringSearch::StringIndex::search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit)
+uint32_t StringSearch::StringIndex::search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit) const
 {
 	if (!indexed)
 		return 0;
@@ -459,12 +462,12 @@ void StringSearch::StringIndex::release(char*** results, size_t size) const
 	}
 }
 
-uint64_t StringSearch::StringIndex::size()
+uint64_t StringSearch::StringIndex::size() const
 {
 	return wordMap.size();
 }
 
-uint64_t StringSearch::StringIndex::libSize()
+uint64_t StringSearch::StringIndex::libSize() const
 {
 	return ngrams.size();
 }

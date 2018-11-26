@@ -91,7 +91,7 @@ namespace StringSearch
 	Escapes all invalid characters to spaces
 	@param str String to be converted
 	*/
-	inline void escapeBlank(std::string& str, const std::unordered_set<char>& const wordChar)
+	inline void escapeBlank(std::string& str, const std::unordered_set<char>& wordChar)
 	{
 		for (char& ch : str)
 			if (wordChar.find(ch) == wordChar.end())
@@ -157,7 +157,7 @@ namespace StringSearch
 		@param str A pointer to the string to generate n-grams from.
 		@param generatedGrams A vector to store the genearated n-grams
 		*/
-		std::vector<int32_t> getGrams(const std::string& str);
+		std::vector<int32_t> getGrams(const std::string& str) const;
 
 		/*!
 		Build n-grams for the member variable \p longLib
@@ -167,7 +167,7 @@ namespace StringSearch
 		/*!
 		Hash for 3-grams
 		*/
-		inline int_fast32_t gramHash(const std::string& const str, size_t startIndex) 
+		inline int32_t gramHash(const std::string& str, size_t startIndex) const
 		{
 			return str[startIndex] << 16 | str[startIndex + 1] << 8 | str[startIndex + 2];
 		}
@@ -179,7 +179,7 @@ namespace StringSearch
 		@param row1 A temporary vector as a cache for the algorithm. Its size must at least (the max size of \p query and \p source) + 1.
 		@param row2 A temporary vector as a cache for the algorithm. Its size must at least (the max size of \p query and \p source) + 1.
 		*/
-		size_t stringMatch(const std::string& query, const std::string& source, std::vector<size_t>& row1, std::vector<size_t>& row2);
+		size_t stringMatch(const std::string& query, const std::string& source, std::vector<size_t>& row1, std::vector<size_t>& row2) const;
 
 		/*!
 		A looper to calculate match scores
@@ -188,23 +188,23 @@ namespace StringSearch
 		@param targets The target strings that have been scored
 		@param currentScore The score for each strings in \p targets
 		*/
-		void getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore);
+		void getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore) const;
 
 		/*!
 		Search in the shortLib
 		@param query The query string.
 		@param score Targets found paired with their corresponding cores generated.
 		*/
-		void searchShort(std::string& query, std::unordered_map<size_t, float>& score);
+		void searchShort(std::string& query, std::unordered_map<size_t, float>& score) const;
 
 		/*!
 		Search in the longLib
 		@param query The query string.
 		@param score Targets found paired with their corresponding cores generated.
 		*/
-		void searchLong(std::string& query, std::unordered_map<size_t, float>& score);
+		void searchLong(std::string& query, std::unordered_map<size_t, float>& score) const;
 
-		uint32_t calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold);
+		uint32_t calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold) const;
 
 		/*!
 		The worker function for search
@@ -213,7 +213,7 @@ namespace StringSearch
 		@param limit The maximum number of results to generate.
 		@param result The matching strings to be selected, sorted from highest score to lowest.
 		*/
-		uint32_t _search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result);
+		uint32_t _search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result) const;
 
 		/*!
 		The search interface function, calls \p _search
@@ -223,7 +223,7 @@ namespace StringSearch
 		@param threshold Lowest acceptable match ratio for a string to be included in the results.
 		@param limit The maximum number of results to generate.
 		*/
-		uint32_t search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit);
+		uint32_t search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit) const;
 
 		/*!
 		Release a result pointer that have been generated in \p search
@@ -234,18 +234,18 @@ namespace StringSearch
 		/*!
 		Get the size of the word map \p wordMap
 		*/
-		uint64_t size();
+		uint64_t size() const;
 
 		/*!
 		Get the size of the n-gram library \p ngrams
 		*/
-		uint64_t libSize();
+		uint64_t libSize() const;
 
 		/*!
 		Trim a string from both ends (in place)
 		@param s The string to be trimmed
 		*/
-		void trim(std::string &s)
+		void trim(std::string &s) const
 		{
 			ltrim(s);
 			rtrim(s);
