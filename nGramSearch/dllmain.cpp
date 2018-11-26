@@ -28,13 +28,12 @@ Index the library based on a 2D array.
 @param words For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key
 @param guid A unique id for the indexed library
 @param size size of the \p words
-@param gSize size of grams to be created. Default 3
 @param weight A list of the relative weight of each key. Default 1 for all
 */
-DLLEXP void index2D(char* const guid, char*** const words, const uint64_t size, const uint16_t rowSize, float** const weight, const uint16_t gSize)
+DLLEXP void index2D(char* const guid, char*** const words, const uint64_t size, const uint16_t rowSize, float** const weight)
 {
 	std::unique_lock<shared_timed_mutex> updLock(mainLock);
-	indexed.emplace(string(guid), make_unique<StringIndex>(words, (size_t)size, rowSize, weight, gSize));
+	indexed.emplace(string(guid), make_unique<StringIndex>(words, (size_t)size, rowSize, weight));
 }
 
 /*!
@@ -46,12 +45,11 @@ In a search, all queries of the words in a row will return the master key.
 @param size size of the \p words
 @param rowSize size of each text rows of \p words.
 @param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
-@param gSize size of grams to be created. Default 3.
 */
-DLLEXP void indexN(char* const guid, char** const words, const uint64_t size, const uint16_t rowSize, float* const weight, const uint16_t gSize)
+DLLEXP void indexN(char* const guid, char** const words, const uint64_t size, const uint16_t rowSize, float* const weight)
 {
 	unique_lock<shared_timed_mutex> updLock(mainLock);
-	indexed.emplace(string(guid), make_unique<StringIndex>(words, (size_t)size, rowSize, weight, gSize));
+	indexed.emplace(string(guid), make_unique<StringIndex>(words, (size_t)size, rowSize, weight));
 }
 
 /*!
