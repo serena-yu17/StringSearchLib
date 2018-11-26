@@ -18,11 +18,11 @@
     <ClInclude Include="nGramSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="nGramSearch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="nGramSearch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
