@@ -5,48 +5,47 @@
 
 #include "nGramSearch.h"
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::getGrams(size_t id)
+void StringSearch::StringIndex::getGrams(size_t id)
 {
 	auto& str = stringLib[id];
-	for (size_t i = 0; i < str.size() - gramSize + 1; i++)
+	for (size_t i = 0; i < str.size() - 2; i++)
 	{
-		auto gram = str.substr(i, gramSize);
-		ngrams[gram].insert(id);
+		auto hash = gramHash(str, i);
+		ngrams[hash].insert(id);
 	}
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::getGrams(const str_t& str, std::vector<str_t>& generatedGrams)
+std::vector<int32_t> StringSearch::StringIndex::getGrams(const std::string& str)
 {
-	for (size_t i = 0; i < str.size() - gramSize + 1; i++)
-		generatedGrams.emplace_back(str.substr(i, gramSize));
+	std::vector<int32_t> generatedGrams;
+	generatedGrams.reserve(str.size() - 2);
+	for (size_t i = 0; i < str.size() - 2; i++)
+		generatedGrams.emplace_back(gramHash(str, i));
+	return generatedGrams;
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::buildGrams()
+void StringSearch::StringIndex::buildGrams()
 {
 	for (auto& id : longLib)
 		getGrams(id);
 	indexed = true;
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::init(std::unordered_map<str_t, std::vector<str_t>>& tempWordMap,
-	std::unordered_map<str_t, std::unordered_map<str_t, float>>& tempWordWeight)
+void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector<std::string>>& tempWordMap,
+	std::unordered_map<std::string, std::unordered_map<std::string, float>>& tempWordWeight)
 {
 	//Centralize all strings in an array so that they do not take replicated spaces
-	std::unordered_set<str_t> tempStrLib;
+	std::unordered_set<std::string> tempStrLib;
 	for (auto& kp : tempWordMap)
 	{
 		tempStrLib.insert(kp.first);
 		for (auto& str : kp.second)
 			tempStrLib.insert(str);
 	}
-	stringLib = std::vector<str_t>(tempStrLib.begin(), tempStrLib.end());
+	stringLib = std::vector<std::string>(tempStrLib.begin(), tempStrLib.end());
 
 	//to separate the long and short libs, since different algorithms will be applied upon searches
-	std::unordered_map<str_t, size_t> stringIndex(stringLib.size());
+	std::unordered_map<std::string, size_t> stringIndex(stringLib.size());
 	for (size_t i = 0; i < stringLib.size(); i++)
 	{
 		stringIndex[stringLib[i]] = i;
@@ -60,7 +59,7 @@ void StringSearch::StringIndex<str_t>::init(std::unordered_map<str_t, std::vecto
 		if (pTargetIndex != stringIndex.end())
 		{
 			auto id = pTargetIndex->second;
-			if (str.size() >= (size_t)gramSize * 2)
+			if (str.size() >= 6)
 				longLib.push_back(id);
 			else
 				shortLib.push_back(id);
@@ -93,24 +92,23 @@ void StringSearch::StringIndex<str_t>::init(std::unordered_map<str_t, std::vecto
 		sectionSizeLong = sizeNeededLong;
 }
 
-template<class str_t>
-StringSearch::StringIndex<str_t>::StringIndex(char_t** const words, const size_t size, const uint16_t rowSize, float* const weight, const uint16_t gSize)
+StringSearch::StringIndex::StringIndex(char** const words, const size_t size, const uint16_t rowSize, float* const weight)
 {
-	if (gSize < 2 || size < 2 || !words)
+	if (size < 2 || !words)
 		return;
-	std::unordered_map<str_t, std::vector<str_t>> tempWordMap(size);
-	std::unordered_map<str_t, std::unordered_map<str_t, float>> tempWeightMap(size);
+	std::unordered_map<std::string, std::vector<std::string>> tempWordMap(size);
+	std::unordered_map<std::string, std::unordered_map<std::string, float>> tempWeightMap(size);
 	for (size_t i = 0; i < size; i += rowSize)
 	{
 		//skip null entries
 		if (!words[i])
 			continue;
-		str_t strKey(words[i]);
+		std::string strKey(words[i]);
 		trim(strKey);
 		//skip empty entries
 		if (strKey.size() == 0)
 			continue;
-		str_t upperKey(strKey);
+		std::string upperKey(strKey);
 		escapeBlank(upperKey, validChar);
 		trim(upperKey);
 		toUpper(upperKey);
@@ -124,7 +122,7 @@ StringSearch::StringIndex<str_t>::StringIndex(char_t** const words, const size_t
 		for (size_t j = i + 1; j < i + rowSize; j++)
 			if (words[j])
 			{
-				str_t strQuery(words[j]);
+				std::string strQuery(words[j]);
 				escapeBlank(strQuery, validChar);
 				trim(strQuery);
 				toUpper(strQuery);
@@ -138,28 +136,26 @@ StringSearch::StringIndex<str_t>::StringIndex(char_t** const words, const size_t
 				}
 			}
 	}
-	gramSize = gSize;
 	init(tempWordMap, tempWeightMap);
 	buildGrams();
 }
 
-template<class str_t>
-StringSearch::StringIndex<str_t>::StringIndex(std::vector<std::vector<str_t>>& words, const int16_t gSize, std::vector<std::vector<float>>& weight)
+StringSearch::StringIndex::StringIndex(std::vector<std::vector<std::string>>& words, std::vector<std::vector<float>>& weight)
 {
-	if (gSize < 2 || words.size() < 2)
+	if (words.size() < 2)
 		return;
 	auto size = words.size();
-	std::unordered_map<str_t, std::vector<str_t>> tempWordMap(size);
-	std::unordered_map<str_t, std::unordered_map<str_t, float>> tempWeightMap(size);
+	std::unordered_map<std::string, std::vector<std::string>> tempWordMap(size);
+	std::unordered_map<std::string, std::unordered_map<std::string, float>> tempWeightMap(size);
 	for (size_t i = 0; i < words.size(); i++)
 	{
 		auto& row = words[i];
-		str_t strKey(row[0]);
+		std::string strKey(row[0]);
 		trim(strKey);
 
 		if (strKey.size() == 0)
 			continue;
-		str_t upperKey(strKey);
+		std::string upperKey(strKey);
 		toUpper(upperKey);
 
 		float currentWeight = 1.0f;
@@ -171,7 +167,7 @@ StringSearch::StringIndex<str_t>::StringIndex(std::vector<std::vector<str_t>>& w
 
 		for (size_t j = 1; j < row.size(); j++)
 		{
-			str_t strQuery(row[j]);
+			std::string strQuery(row[j]);
 			trim(strQuery);
 			if (strQuery.size() != 0)
 			{
@@ -184,29 +180,27 @@ StringSearch::StringIndex<str_t>::StringIndex(std::vector<std::vector<str_t>>& w
 			}
 		}
 	}
-	gramSize = gSize;
 	init(tempWordMap, tempWeightMap);
 	buildGrams();
 }
 
-template<class str_t>
-StringSearch::StringIndex<str_t>::StringIndex(char_t*** const words, const size_t size, const uint16_t rowSize, float** weight, const uint16_t gSize)
+StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, const uint16_t rowSize, float** weight)
 {
-	if (gSize < 2 || size < 2)
+	if (size < 2)
 		return;
-	std::unordered_map<str_t, std::vector<str_t>> tempWordMap(size);
-	std::unordered_map<str_t, std::unordered_map<str_t, float>> tempWeightMap(size);
+	std::unordered_map<std::string, std::vector<std::string>> tempWordMap(size);
+	std::unordered_map<std::string, std::unordered_map<std::string, float>> tempWeightMap(size);
 	for (size_t i = 0; i < size; i++)
 	{
 		//skip null entries
 		if (!words[i] || !words[i][0])
 			continue;
-		str_t strKey(words[i][0]);
+		std::string strKey(words[i][0]);
 		trim(strKey);
 		//skip empty entries
 		if (strKey.size() == 0)
 			continue;
-		str_t upperKey(strKey);
+		std::string upperKey(strKey);
 		escapeBlank(upperKey, validChar);
 		trim(upperKey);
 		toUpper(upperKey);
@@ -220,7 +214,7 @@ StringSearch::StringIndex<str_t>::StringIndex(char_t*** const words, const size_
 		for (uint16_t j = 1; j < rowSize; j++)
 			if (words[i][j])
 			{
-				str_t strQuery(words[i][j]);
+				std::string strQuery(words[i][j]);
 				escapeBlank(strQuery, validChar);
 				trim(strQuery);
 				toUpper(strQuery);
@@ -235,13 +229,11 @@ StringSearch::StringIndex<str_t>::StringIndex(char_t*** const words, const size_
 				}
 			}
 	}
-	gramSize = gSize;
 	init(tempWordMap, tempWeightMap);
 	buildGrams();
 }
 
-template<class str_t>
-size_t StringSearch::StringIndex<str_t>::stringMatch(const str_t& query, const str_t& source, std::vector<size_t>& row1, std::vector<size_t>& row2)
+size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source, std::vector<size_t>& row1, std::vector<size_t>& row2)
 {
 	if (query.size() == 1)
 	{
@@ -282,11 +274,10 @@ size_t StringSearch::StringIndex<str_t>::stringMatch(const str_t& query, const s
 	return qSize - misMatch;
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::getMatchScore(const str_t& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore)
+void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore)
 {
-	auto size = std::max(query.size() + 1, (size_t)gramSize * 2);
-	if (query.size() <= (size_t)gramSize)
+	auto size = std::max(query.size() + 1, (size_t)6);
+	if (query.size() <= 3)
 		size = longest + 1;
 	//allocate levenstein temporary containers
 	std::vector<size_t> row1(size);
@@ -299,7 +290,7 @@ void StringSearch::StringIndex<str_t>::getMatchScore(const str_t& query, size_t 
 		targets[i] = source;
 	}
 	//search for all strings if n-gram does not work
-	if (query.size() <= (size_t)gramSize)
+	if (query.size() <= 3)
 		for (size_t i = first * sectionSizeLong; i < first * sectionSizeLong + sectionSizeLong && i < longLib.size(); i++)
 		{
 			auto& source = longLib[i];
@@ -309,12 +300,11 @@ void StringSearch::StringIndex<str_t>::getMatchScore(const str_t& query, size_t 
 		}
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::searchShort(str_t& query, std::unordered_map<size_t, float>& score)
+void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_map<size_t, float>& score)
 {
 	auto len = query.size();
 	auto dicSize = shortLib.size();
-	if (query.size() <= (size_t)gramSize)
+	if (query.size() <= 3)
 		dicSize += longLib.size();
 	std::vector<size_t> targets(dicSize);
 	std::vector<float> currentScore(dicSize);
@@ -328,24 +318,20 @@ void StringSearch::StringIndex<str_t>::searchShort(str_t& query, std::unordered_
 		score[targets[i]] += currentScore[i];
 }
 
-
-template<class str_t>
-void StringSearch::StringIndex<str_t>::searchLong(str_t& query, std::unordered_map<size_t, float>& score)
+void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_map<size_t, float>& score)
 {
 	auto len = query.size();
-	if (len < (size_t)gramSize)
+	if (len < (size_t)3)
 		return;
 
-	std::vector<str_t> generatedGrams;
-	generatedGrams.reserve(len - gramSize + 1);
-	getGrams(query, generatedGrams);
-	if (generatedGrams.size() == 0)
+	auto generatedGrams = getGrams(query);
+	if (generatedGrams.empty())
 		return;
 	std::unordered_map<size_t, size_t> rawScore(longLib.size());
 	//may consider parallelsm here in the future
-	for (auto& str : generatedGrams)
+	for (auto& gram : generatedGrams)
 	{
-		const auto& sourceSet = ngrams[str];
+		const auto& sourceSet = ngrams[gram];
 		for (auto& match : sourceSet)
 			rawScore[match]++;
 	}
@@ -353,8 +339,7 @@ void StringSearch::StringIndex<str_t>::searchLong(str_t& query, std::unordered_m
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
-template<class str_t>
-uint32_t StringSearch::StringIndex<str_t>::calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold)
+uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold)
 {
 	uint32_t perfMatchCount = 0;
 	for (auto& scorePair : scoreList)
@@ -381,10 +366,9 @@ uint32_t StringSearch::StringIndex<str_t>::calcScore(std::unordered_map<size_t, 
 	return perfMatchCount;
 }
 
-template<class str_t>
-uint32_t StringSearch::StringIndex<str_t>::_search(const char_t* query, const float threshold, const uint32_t limit, std::vector<size_t>& result)
+uint32_t StringSearch::StringIndex::_search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result)
 {
-	str_t queryStr(query);
+	std::string queryStr(query);
 	std::unordered_map<size_t, float> entryScore;
 	uint32_t perfMatchCount = 0;
 
@@ -407,7 +391,7 @@ uint32_t StringSearch::StringIndex<str_t>::_search(const char_t* query, const fl
 		std::unordered_map<size_t, float> scoreLong(longLib.size());
 		std::vector<std::future<void>> futures;
 		//if the query is long, there is no need to search for short sequences.
-		if (queryStr.size() < (size_t)gramSize * 3)
+		if (queryStr.size() < 9)
 			futures.emplace_back(
 				std::async(std::launch::async, &StringIndex::searchShort, this, std::ref(queryStr), ref(scoreShort))
 			);
@@ -439,8 +423,7 @@ uint32_t StringSearch::StringIndex<str_t>::_search(const char_t* query, const fl
 	return perfMatchCount;
 }
 
-template<class str_t>
-uint32_t StringSearch::StringIndex<str_t>::search(const char_t* query, char_t*** results, uint32_t* size, const float threshold, uint32_t limit)
+uint32_t StringSearch::StringIndex::search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit)
 {
 	if (!indexed)
 		return 0;
@@ -454,20 +437,19 @@ uint32_t StringSearch::StringIndex<str_t>::search(const char_t* query, char_t***
 
 	//transform to C ABI using pointers
 	*size = (uint32_t)result.size();
-	*results = new char_t*[*size];
+	*results = new char*[*size];
 	for (uint32_t i = 0; i < *size; i++)
 	{
 		auto item = result[i];
 		auto resStr = stringLib[item].c_str();
 		auto len = stringLib[item].size();
-		(*results)[i] = new char_t[len + 1]();
+		(*results)[i] = new char[len + 1]();
 		memcpy((*results)[i], resStr, len);
 	}
 	return perfMatchCount;
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::release(char_t*** results, size_t size) const
+void StringSearch::StringIndex::release(char*** results, size_t size) const
 {
 	if (*results)
 	{
@@ -477,20 +459,17 @@ void StringSearch::StringIndex<str_t>::release(char_t*** results, size_t size) c
 	}
 }
 
-template<class str_t>
-uint64_t StringSearch::StringIndex<str_t>::size()
+uint64_t StringSearch::StringIndex::size()
 {
 	return wordMap.size();
 }
 
-template<class str_t>
-uint64_t StringSearch::StringIndex<str_t>::libSize()
+uint64_t StringSearch::StringIndex::libSize()
 {
 	return ngrams.size();
 }
 
-template<class str_t>
-void StringSearch::StringIndex<str_t>::setValidChar(std::unordered_set<char_t>& newValidChar)
+void StringSearch::StringIndex::setValidChar(std::unordered_set<char>& newValidChar)
 {
 	validChar = std::move(newValidChar);
 }
