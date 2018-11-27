@@ -42,6 +42,7 @@ DLLEXP uint32_t index2D(char*** const words, const uint64_t size, const uint16_t
 	if (handle == maxVal)
 		return 0;
 	indexed.emplace(handle, make_unique<StringIndex>(words, (size_t)size, rowSize, weight));
+	return handle;
 }
 
 /*!
@@ -65,6 +66,7 @@ DLLEXP uint32_t indexN(char** const words, const uint64_t size, const uint16_t r
 	if (handle == maxVal)
 		return 0;
 	indexed.emplace(handle, make_unique<StringIndex>(words, (size_t)size, rowSize, weight));
+	return handle;
 }
 
 /*!
