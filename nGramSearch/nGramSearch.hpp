@@ -266,7 +266,7 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 		}
 		swap(row1, row2);
 		//memset(row2, 0, sizeof(unsigned) * (maxSize + 1));
-		fill(row2.begin(), row2.end(), 0);
+		std::fill(row2.begin(), row2.end(), 0);
 	}
 	size_t misMatch = (std::numeric_limits<size_t>::max)();
 	for (unsigned i = 0; i < sSize + 1; i++)
