@@ -333,9 +333,13 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 	//may consider parallelsm here in the future
 	for (auto& gram : generatedGrams)
 	{
-		const auto& sourceSet = ngrams.find(gram)->second;
-		for (auto& match : sourceSet)
-			rawScore[match]++;
+		const auto& found = ngrams.find(gram);
+		if (found != ngrams.end())
+		{
+			auto& sourceSet = found->second;
+			for (auto& match : sourceSet)
+				rawScore[match]++;
+		}
 	}
 	for (auto& kp : rawScore)
 		score[kp.first] = (float)kp.second / generatedGrams.size();
