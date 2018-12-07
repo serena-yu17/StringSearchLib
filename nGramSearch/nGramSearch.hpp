@@ -82,6 +82,10 @@ void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector
 		}
 	}
 
+	stringLib.shrink_to_fit();
+	longLib.shrink_to_fit();
+	shortLib.shrink_to_fit();
+
 	//Each future involves an overhead of about 1-2 us, so I am limiting the number of futures to hardware concurrency
 	auto nThrd = std::thread::hardware_concurrency();
 	size_t sizeNeededShort = (size_t)ceil((float)shortLib.size() / nThrd);
