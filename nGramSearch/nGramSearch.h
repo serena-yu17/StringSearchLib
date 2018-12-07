@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <mutex>
 #include <cctype>
-#include <wchar.h>
 #include <cwctype>
 #include <unordered_set>
 #include <algorithm>
