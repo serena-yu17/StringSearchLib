@@ -349,7 +349,7 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
-uint32_t StringSearch::StringIndex::calcScore(std::string query, std::unordered_map<size_t, float>& entryScore,
+uint32_t StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore,
 	std::unordered_map<size_t, float>& scoreList, const float threshold) const
 {
 	uint32_t perfMatchCount = 0;
@@ -366,14 +366,17 @@ uint32_t StringSearch::StringIndex::calcScore(std::string query, std::unordered_
 				auto weightPair = weightDicPair->second.find(keyWord);
 				if (weightPair != weightDicPair->second.end())
 				{
-					//exact matches will be on top
-					if (stringLib[keyWord] == query)
-						entryScore[keyWord] = 100;
-					else
-						entryScore[keyWord] = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
-					//A float value should not be directly compared to integer 1
+					auto score = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
+					//the score is considered perfect with a delta of 1E-4
 					if (std::abs(scorePair.second - 1) < delta)
+					{
 						perfMatchCount++;
+
+						//On exact match, promote to top
+						if (stringLib[keyWord] == query)
+							score = 100;
+					}
+					entryScore[keyWord] = score;
 				}
 			}
 	}
