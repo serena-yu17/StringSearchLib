@@ -420,8 +420,8 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 
 		//merge scores to entryScore
 		entryScore.reserve(scoreShort.size() + scoreLong.size());
-		perfMatchCount += calcScore(query, entryScore, scoreShort, threshold);
-		perfMatchCount += calcScore(query, entryScore, scoreLong, threshold);
+		perfMatchCount += calcScore(queryStr, entryScore, scoreShort, threshold);
+		perfMatchCount += calcScore(queryStr, entryScore, scoreLong, threshold);
 	}
 
 	std::vector<std::pair<size_t, float>> scoreElems(entryScore.begin(), entryScore.end());
