@@ -237,7 +237,7 @@ StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, c
 	buildGrams();
 }
 
-size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source, 
+size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source,
 	std::vector<size_t>& row1, std::vector<size_t>& row2) const
 {
 	if (query.size() == 1)
@@ -279,7 +279,7 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 	return qSize - misMatch;
 }
 
-void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, 
+void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets,
 	std::vector<float>& currentScore) const
 {
 	auto size = std::max(query.size() + 1, (size_t)6);
@@ -349,7 +349,7 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
-uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>& entryScore, 
+uint32_t StringSearch::StringIndex::calcScore(std::string query, std::unordered_map<size_t, float>& entryScore,
 	std::unordered_map<size_t, float>& scoreList, const float threshold) const
 {
 	uint32_t perfMatchCount = 0;
@@ -366,8 +366,11 @@ uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>&
 				auto weightPair = weightDicPair->second.find(keyWord);
 				if (weightPair != weightDicPair->second.end())
 				{
-					float itemScore = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
-					entryScore[keyWord] = itemScore;
+					//exact matches will be on top
+					if (stringLib[keyWord] == query)
+						entryScore[keyWord] = 100;
+					else
+						entryScore[keyWord] = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
 					//A float value should not be directly compared to integer 1
 					if (std::abs(scorePair.second - 1) < delta)
 						perfMatchCount++;
@@ -414,8 +417,8 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 
 		//merge scores to entryScore
 		entryScore.reserve(scoreShort.size() + scoreLong.size());
-		perfMatchCount += calcScore(entryScore, scoreShort, threshold);
-		perfMatchCount += calcScore(entryScore, scoreLong, threshold);
+		perfMatchCount += calcScore(query, entryScore, scoreShort, threshold);
+		perfMatchCount += calcScore(query, entryScore, scoreLong, threshold);
 	}
 
 	std::vector<std::pair<size_t, float>> scoreElems(entryScore.begin(), entryScore.end());
