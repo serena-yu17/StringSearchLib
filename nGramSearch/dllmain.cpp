@@ -19,7 +19,7 @@
 using namespace std;
 using namespace StringSearch;
 
-shared_timed_mutex mainLock;
+std::shared_mutex mainLock;
 //key entries for indexed StringIndex class instances
 unordered_map<uint32_t, unique_ptr<StringIndex>> indexed;
 
@@ -33,7 +33,7 @@ Index the library based on a 2D array.
 */
 DLLEXP uint32_t index2D(char*** const words, const uint64_t size, const uint16_t rowSize, float** const weight)
 {
-	std::unique_lock<shared_timed_mutex> updLock(mainLock);
+	std::unique_lock<shared_mutex> updLock(mainLock);
 	//0 is reserved to represent an empty handle
 	uint32_t handle = 1;
 	const uint32_t maxVal = (numeric_limits<uint32_t>::max)();
@@ -57,7 +57,7 @@ In a search, all queries of the words in a row will return the master key.
 */
 DLLEXP uint32_t indexN(char** const words, const uint64_t size, const uint16_t rowSize, float* const weight)
 {
-	unique_lock<shared_timed_mutex> updLock(mainLock);
+	unique_lock<shared_mutex> updLock(mainLock);
 	//0 is reserved to represent an empty handle
 	uint32_t handle = 1;
 	const uint32_t maxVal = (numeric_limits<uint32_t>::max)();
@@ -81,7 +81,7 @@ Must call \p release to clean up after use.
 */
 DLLEXP uint32_t search(uint32_t handle, const char* query, char*** results, uint32_t* size, float threshold, uint32_t limit)
 {
-	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto pkeyPair = indexed.find(handle);
 	if (pkeyPair != indexed.end() && pkeyPair->second)
 	{
@@ -98,7 +98,7 @@ To release the memory allocated for the result in the \p search function
 */
 DLLEXP void release(uint32_t handle, char*** results, uint64_t size)
 {
-	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto keyPair = indexed.find(handle);
 	if (keyPair != indexed.end() && keyPair->second)
 		keyPair->second->release(results, (size_t)size);
@@ -110,7 +110,7 @@ To dispose a library indexed. If the library does not exist, \p dispose will ign
 */
 DLLEXP void dispose(uint32_t handle)
 {
-	unique_lock<shared_timed_mutex> updLock(mainLock);
+	unique_lock<shared_mutex> updLock(mainLock);
 	indexed.erase(handle);
 }
 
@@ -120,7 +120,7 @@ To obtain the current word map size
 */
 DLLEXP uint64_t getSize(uint32_t handle)
 {
-	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto keyPair = indexed.find(handle);
 	if (keyPair != indexed.end() && keyPair->second)
 		return keyPair->second->size();
@@ -133,7 +133,7 @@ To obtain the current n-gram library size.
 */
 DLLEXP uint64_t getLibSize(uint32_t handle)
 {
-	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto keyPair = indexed.find(handle);
 	if (keyPair != indexed.end() && keyPair->second)
 		return keyPair->second->libSize();
@@ -145,7 +145,7 @@ DLLEXP void setValidChar(uint32_t handle, char* const characters, int n)
 	std::unordered_set<char> newValidChar(n);
 	for (int i = 0; i < n; i++)
 		newValidChar.insert(characters[i]);
-	shared_lock<shared_timed_mutex> sharedLock(mainLock);
+	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto keyPair = indexed.find(handle);
 	if (keyPair != indexed.end() && keyPair->second)
 		keyPair->second->setValidChar(newValidChar);
