@@ -459,21 +459,14 @@ uint32_t StringSearch::StringIndex::search(const char* query, char*** results, u
 	{
 		auto item = result[i];
 		auto resStr = stringLib[item].c_str();
-		auto len = stringLib[item].size();
-		(*results)[i] = new char[len + 1]();
-		memcpy((*results)[i], resStr, len);
+		(*results)[i] = const_cast<char*>(resStr);
 	}
 	return perfMatchCount;
 }
 
 void StringSearch::StringIndex::release(char*** results, size_t size) const
 {
-	if (*results)
-	{
-		for (size_t i = 0; i < size; i++)
-			delete[](*results)[i];
-		delete[](*results);
-	}
+	delete[](*results);
 }
 
 uint64_t StringSearch::StringIndex::size() const
