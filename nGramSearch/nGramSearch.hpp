@@ -82,6 +82,10 @@ void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector
 		}
 	}
 
+	stringLib.shrink_to_fit();
+	longLib.shrink_to_fit();
+	shortLib.shrink_to_fit();
+
 	//Each future involves an overhead of about 1-2 us, so I am limiting the number of futures to hardware concurrency
 	auto nThrd = std::thread::hardware_concurrency();
 	size_t sizeNeededShort = (size_t)ceil((float)shortLib.size() / nThrd);
@@ -233,7 +237,7 @@ StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, c
 	buildGrams();
 }
 
-size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source, 
+size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source,
 	std::vector<size_t>& row1, std::vector<size_t>& row2) const
 {
 	if (query.size() == 1)
@@ -275,7 +279,7 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 	return qSize - misMatch;
 }
 
-void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, 
+void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets,
 	std::vector<float>& currentScore) const
 {
 	auto size = std::max(query.size() + 1, (size_t)6);
@@ -345,7 +349,7 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
-uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>& entryScore, 
+uint32_t StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore,
 	std::unordered_map<size_t, float>& scoreList, const float threshold) const
 {
 	uint32_t perfMatchCount = 0;
@@ -362,11 +366,17 @@ uint32_t StringSearch::StringIndex::calcScore(std::unordered_map<size_t, float>&
 				auto weightPair = weightDicPair->second.find(keyWord);
 				if (weightPair != weightDicPair->second.end())
 				{
-					float itemScore = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
-					entryScore[keyWord] = itemScore;
-					//A float value should not be directly compared to integer 1
+					auto score = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
+					//the score is considered perfect with a delta of 1E-4
 					if (std::abs(scorePair.second - 1) < delta)
+					{
 						perfMatchCount++;
+
+						//On exact match, promote to top
+						if (stringLib[keyWord] == query)
+							score = 100;
+					}
+					entryScore[keyWord] = score;
 				}
 			}
 	}
@@ -410,8 +420,8 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 
 		//merge scores to entryScore
 		entryScore.reserve(scoreShort.size() + scoreLong.size());
-		perfMatchCount += calcScore(entryScore, scoreShort, threshold);
-		perfMatchCount += calcScore(entryScore, scoreLong, threshold);
+		perfMatchCount += calcScore(queryStr, entryScore, scoreShort, threshold);
+		perfMatchCount += calcScore(queryStr, entryScore, scoreLong, threshold);
 	}
 
 	std::vector<std::pair<size_t, float>> scoreElems(entryScore.begin(), entryScore.end());
@@ -449,21 +459,14 @@ uint32_t StringSearch::StringIndex::search(const char* query, char*** results, u
 	{
 		auto item = result[i];
 		auto resStr = stringLib[item].c_str();
-		auto len = stringLib[item].size();
-		(*results)[i] = new char[len + 1]();
-		memcpy((*results)[i], resStr, len);
+		(*results)[i] = const_cast<char*>(resStr);
 	}
 	return perfMatchCount;
 }
 
 void StringSearch::StringIndex::release(char*** results, size_t size) const
 {
-	if (*results)
-	{
-		for (size_t i = 0; i < size; i++)
-			delete[](*results)[i];
-		delete[](*results);
-	}
+	delete[](*results);
 }
 
 uint64_t StringSearch::StringIndex::size() const

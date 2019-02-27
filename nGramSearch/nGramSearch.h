@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <mutex>
 #include <cctype>
-#include <wchar.h>
 #include <cwctype>
 #include <unordered_set>
 #include <algorithm>
@@ -204,7 +203,7 @@ namespace StringSearch
 		*/
 		void searchLong(std::string& query, std::unordered_map<size_t, float>& score) const;
 
-		uint32_t calcScore(std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold) const;
+		uint32_t calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold) const;
 
 		/*!
 		The worker function for search
@@ -281,6 +280,8 @@ namespace StringSearch
 
 		//! The library for all words that have a length >= \p gramSize * 2
 		std::vector<size_t> longLib;
+
+		std::unordered_map<std::string, size_t> longMap;
 
 		//! The library for all words that have a length < \p gramSize * 2
 		std::vector<size_t> shortLib;
