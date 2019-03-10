@@ -120,8 +120,11 @@ StringSearch::StringIndex::StringIndex(char** const words, const size_t size, co
 		float currentWeight = 1.0f;
 		if (weight)
 			currentWeight = weight[i];
-		tempWordMap[upperKey].push_back(strKey);
-		tempWeightMap[strKey][upperKey] = currentWeight;
+		if (currentWeight != 0.0f)
+		{
+			tempWordMap[upperKey].push_back(strKey);
+			tempWeightMap[strKey][upperKey] = currentWeight;
+		}
 
 		for (size_t j = i + 1; j < i + rowSize; j++)
 			if (words[j])
@@ -135,8 +138,11 @@ StringSearch::StringIndex::StringIndex(char** const words, const size_t size, co
 					currentWeight = 1.0f;
 					if (weight)
 						currentWeight = weight[j];
-					tempWordMap[strQuery].push_back(strKey);
-					tempWeightMap[strQuery][strKey] = currentWeight;
+					if (currentWeight != 0.0f)
+					{
+						tempWordMap[strQuery].push_back(strKey);
+						tempWeightMap[strQuery][strKey] = currentWeight;
+					}
 				}
 			}
 	}
