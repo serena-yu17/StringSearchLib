@@ -19,7 +19,7 @@
 using namespace std;
 using namespace StringSearch;
 
-shared_mutex mainLock;
+std::shared_mutex mainLock;
 //key entries for indexed StringIndex class instances
 unordered_map<uint32_t, unique_ptr<StringIndex>> indexed;
 
