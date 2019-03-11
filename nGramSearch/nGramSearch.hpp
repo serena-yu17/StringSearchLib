@@ -436,7 +436,7 @@ std::vector<std::pair<size_t, float>> StringSearch::StringIndex::_search(const c
 uint32_t StringSearch::StringIndex::score(const char* query, char*** results, float** scores, const float threshold, uint32_t limit) const
 {
 	if (!indexed)
-		return;
+		return 0;
 
 	if (limit == 0)
 		limit = (std::numeric_limits<int32_t>::max)();

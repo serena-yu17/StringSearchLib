@@ -14,7 +14,6 @@ TEST(StringTest, test_for_search) {
 	EXPECT_EQ(7, getSize(handle));
 	EXPECT_EQ(16, getLibSize(handle));
 	char*** result = nullptr;
-	uint32_t* size = 0;
-	auto perfCount = search(handle, "LWMS", result, size, 0.5f, (numeric_limits<int>::max)());
-	EXPECT_EQ(4, perfCount);
+	auto size = search(handle, "LWMS", result, 0.5f, (numeric_limits<int>::max)());
+	EXPECT_EQ(4, size);
 }
