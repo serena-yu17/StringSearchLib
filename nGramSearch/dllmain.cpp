@@ -79,15 +79,35 @@ Must call \p release to clean up after use.
 @param threshold Lowest acceptable matching %, as a value between 0 and 1
 @param limit Maximum results generated
 */
-DLLEXP uint32_t search(uint32_t handle, const char* query, char*** results, uint32_t* size, float threshold, uint32_t limit)
+DLLEXP uint32_t search(uint32_t handle, const char* query, char*** results, float threshold, uint32_t limit)
 {
 	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto pkeyPair = indexed.find(handle);
 	if (pkeyPair != indexed.end() && pkeyPair->second)
 	{
-		return pkeyPair->second->search(query, results, size, threshold, limit);
+		return pkeyPair->second->search(query, results, threshold, limit);
 	}
 	return 0;
+}
+
+/*!
+Search the query in the indexed library identified by the guid.
+@param handle A unique id for the indexed library
+@param query The query string
+@param results The pointer to a string array for output. The memory will be allocated by new.
+Must call \p release to clean up after use.
+@param size Output the length of the \p results array.
+@param threshold Lowest acceptable matching %, as a value between 0 and 1
+@param limit Maximum results generated
+*/
+DLLEXP uint32_t score(uint32_t handle, const char* query, char*** results, float** scores, float threshold, uint32_t limit)
+{
+	shared_lock<shared_mutex> sharedLock(mainLock);
+	auto pkeyPair = indexed.find(handle);
+	if (pkeyPair != indexed.end() && pkeyPair->second)
+	{
+		return pkeyPair->second->score(query, results, scores, threshold, limit);
+	}
 }
 
 /*!
@@ -96,12 +116,12 @@ To release the memory allocated for the result in the \p search function
 @param results The result returned by the <search> function.
 @param size Length of \p result
 */
-DLLEXP void release(uint32_t handle, char*** results, uint64_t size)
+DLLEXP void release(uint32_t handle, char** results, float* scores)
 {
 	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto keyPair = indexed.find(handle);
 	if (keyPair != indexed.end() && keyPair->second)
-		keyPair->second->release(results, (size_t)size);
+		keyPair->second->release(results, scores);
 }
 
 /*!
