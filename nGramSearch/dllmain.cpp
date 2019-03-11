@@ -79,7 +79,7 @@ Must call \p release to clean up after use.
 @param threshold Lowest acceptable matching %, as a value between 0 and 1
 @param limit Maximum results generated
 */
-DLLEXP uint32_t search(uint32_t handle, const char* query, char*** results,float threshold, uint32_t limit)
+DLLEXP uint32_t search(uint32_t handle, const char* query, char*** results, float threshold, uint32_t limit)
 {
 	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto pkeyPair = indexed.find(handle);
@@ -116,7 +116,7 @@ To release the memory allocated for the result in the \p search function
 @param results The result returned by the <search> function.
 @param size Length of \p result
 */
-DLLEXP void release(uint32_t handle, char*** results, float** scores)
+DLLEXP void release(uint32_t handle, char** results, float* scores)
 {
 	shared_lock<shared_mutex> sharedLock(mainLock);
 	auto keyPair = indexed.find(handle);

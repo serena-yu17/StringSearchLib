@@ -239,7 +239,7 @@ namespace StringSearch
 		@param results The strings allocated using the \p new operator.
 		@param scores The scores allocated using the \p new operator.
 		*/
-		void release(char*** results, float** scores) const;
+		void release(char** results, float* scores) const;
 
 		/*!
 		Get the size of the word map \p wordMap

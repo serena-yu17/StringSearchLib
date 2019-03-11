@@ -481,12 +481,12 @@ uint32_t StringSearch::StringIndex::search(const char* query, char*** results, c
 	return size;
 }
 
-void StringSearch::StringIndex::release(char*** results, float** scores) const
+void StringSearch::StringIndex::release(char** results, float* scores) const
 {
-	if (results && *results)
-		delete[](*results);
-	if (scores && *scores)
-		delete[](*scores);
+	if (results)
+		delete[] results;
+	if (scores)
+		delete[] scores;
 }
 
 uint64_t StringSearch::StringIndex::size() const
