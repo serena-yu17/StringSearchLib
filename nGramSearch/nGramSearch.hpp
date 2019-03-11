@@ -355,10 +355,9 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
-uint32_t StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore,
+void StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore,
 	std::unordered_map<size_t, float>& scoreList, const float threshold) const
 {
-	uint32_t perfMatchCount = 0;
 	for (auto& scorePair : scoreList)
 	{
 		if (scorePair.second < threshold)
@@ -374,26 +373,21 @@ uint32_t StringSearch::StringIndex::calcScore(std::string& query, std::unordered
 				{
 					auto score = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
 					//the score is considered perfect with a delta of 1E-4
-					if (std::abs(scorePair.second - 1) < delta)
+					if (std::abs(scorePair.second - 1) < delta && stringLib[keyWord] == query)
 					{
-						perfMatchCount++;
-
-						//On exact match, promote to top
-						if (stringLib[keyWord] == query)
-							score = 100;
+						//On exact match, promote to top						
+						score = 100;
 					}
 					entryScore[keyWord] = score;
 				}
 			}
 	}
-	return perfMatchCount;
 }
 
-uint32_t StringSearch::StringIndex::_search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result) const
+std::vector<std::pair<size_t, float>> StringSearch::StringIndex::_search(const char* query, const float threshold, const uint32_t limit) const
 {
 	std::string queryStr(query);
 	std::unordered_map<size_t, float> entryScore;
-	uint32_t perfMatchCount = 0;
 
 	//wildcard
 	if (queryStr.size() == 1 && queryStr[0] == '*')
@@ -408,7 +402,7 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 		escapeBlank(queryStr, validChar);
 		trim(queryStr);
 		if (queryStr.size() == 0)
-			return 0;
+			return std::vector<std::pair<size_t, float>>();
 		toUpper(queryStr);
 		std::unordered_map<size_t, float> scoreShort(shortLib.size());
 		std::unordered_map<size_t, float> scoreLong(longLib.size());
@@ -426,8 +420,8 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 
 		//merge scores to entryScore
 		entryScore.reserve(scoreShort.size() + scoreLong.size());
-		perfMatchCount += calcScore(queryStr, entryScore, scoreShort, threshold);
-		perfMatchCount += calcScore(queryStr, entryScore, scoreLong, threshold);
+		calcScore(queryStr, entryScore, scoreShort, threshold);
+		calcScore(queryStr, entryScore, scoreLong, threshold);
 	}
 
 	std::vector<std::pair<size_t, float>> scoreElems(entryScore.begin(), entryScore.end());
@@ -436,17 +430,35 @@ uint32_t StringSearch::StringIndex::_search(const char* query, const float thres
 		endIt = scoreElems.begin() + limit;
 	std::partial_sort(scoreElems.begin(), endIt, scoreElems.end(), ScoreComparer(*this));
 
-	endIt = scoreElems.end();
-	if (scoreElems.size() > limit)
-		endIt = scoreElems.begin() + limit;
-	result.reserve(std::min((size_t)limit, scoreElems.size()));
-	for (auto i = scoreElems.begin(); i < endIt; i++)
-		result.push_back(i->first);
-
-	return perfMatchCount;
+	return scoreElems;
 }
 
-uint32_t StringSearch::StringIndex::search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit) const
+uint32_t StringSearch::StringIndex::score(const char* query, char*** results, float** scores, const float threshold, uint32_t limit) const
+{
+	if (!indexed)
+		return;
+
+	if (limit == 0)
+		limit = (std::numeric_limits<int32_t>::max)();
+
+	auto result = _search(query, threshold, limit);
+
+	uint32_t size = std::min((uint32_t)result.size(), limit);
+
+	//transform to C ABI using pointers
+	*scores = new float[size];
+	*results = new char*[size];
+	for (uint32_t i = 0; i < size; i++)
+	{
+		auto item = result[i].first;
+		auto resStr = stringLib[item].c_str();
+		(*results)[i] = const_cast<char*>(resStr);
+		(*scores)[i] = result[i].second;
+	}
+	return size;
+}
+
+uint32_t StringSearch::StringIndex::search(const char* query, char*** results, const float threshold, uint32_t limit) const
 {
 	if (!indexed)
 		return 0;
@@ -454,32 +466,27 @@ uint32_t StringSearch::StringIndex::search(const char* query, char*** results, u
 	if (limit == 0)
 		limit = (std::numeric_limits<int32_t>::max)();
 
-	std::vector<size_t> result;
+	auto result = _search(query, threshold, limit);
 
-	auto perfMatchCount = _search(query, threshold, limit, result);
+	uint32_t size = std::min((uint32_t)result.size(), limit);
 
 	//transform to C ABI using pointers
-	*size = (uint32_t)result.size();
-	*results = new char*[*size];
-	for (uint32_t i = 0; i < *size; i++)
+	*results = new char*[size];
+	for (uint32_t i = 0; i < size; i++)
 	{
-		auto item = result[i];
+		auto item = result[i].first;
 		auto resStr = stringLib[item].c_str();
-		auto len = stringLib[item].size();
-		(*results)[i] = new char[len + 1]();
-		memcpy((*results)[i], resStr, len);
+		(*results)[i] = const_cast<char*>(resStr);
 	}
-	return perfMatchCount;
+	return size;
 }
 
-void StringSearch::StringIndex::release(char*** results, size_t size) const
+void StringSearch::StringIndex::release(char*** results, float** scores) const
 {
-	if (*results)
-	{
-		for (size_t i = 0; i < size; i++)
-			delete[](*results)[i];
+	if (results && *results)
 		delete[](*results);
-	}
+	if (scores && *scores)
+		delete[](*scores);
 }
 
 uint64_t StringSearch::StringIndex::size() const

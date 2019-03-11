@@ -203,7 +203,7 @@ namespace StringSearch
 		*/
 		void searchLong(std::string& query, std::unordered_map<size_t, float>& score) const;
 
-		uint32_t calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold) const;
+		void calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold) const;
 
 		/*!
 		The worker function for search
@@ -212,7 +212,7 @@ namespace StringSearch
 		@param limit The maximum number of results to generate.
 		@param result The matching strings to be selected, sorted from highest score to lowest.
 		*/
-		uint32_t _search(const char* query, const float threshold, const uint32_t limit, std::vector<size_t>& result) const;
+		std::vector<std::pair<size_t, float>> _search(const char* query, const float threshold, const uint32_t limit) const;
 
 		/*!
 		The search interface function, calls \p _search
@@ -222,13 +222,24 @@ namespace StringSearch
 		@param threshold Lowest acceptable match ratio for a string to be included in the results.
 		@param limit The maximum number of results to generate.
 		*/
-		uint32_t search(const char* query, char*** results, uint32_t* size, const float threshold, uint32_t limit) const;
+		uint32_t search(const char* query, char*** results, const float threshold, uint32_t limit) const;
+
+		/*!
+		The search interface function, calls \p _search
+		@param query The query string.
+		@param results The matching strings to be selected, sorted from highest score to lowest.
+		@param size The number of strings in the result array.
+		@param threshold Lowest acceptable match ratio for a string to be included in the results.
+		@param limit The maximum number of results to generate.
+		*/
+		uint32_t score(const char* query, char*** results, float** scores, const float threshold, uint32_t limit) const;
 
 		/*!
 		Release a result pointer that have been generated in \p search
-		@param results The matching strings to be selected, allocated using the \p new operator.
+		@param results The strings allocated using the \p new operator.
+		@param scores The scores allocated using the \p new operator.
 		*/
-		void release(char*** results, size_t size) const;
+		void release(char*** results, float** scores) const;
 
 		/*!
 		Get the size of the word map \p wordMap
