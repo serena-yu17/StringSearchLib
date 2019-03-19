@@ -54,18 +54,18 @@ void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector
 	}
 	for (auto& kp : tempWordMap)
 	{
-		auto& str = kp.first;
-		auto pTargetIndex = stringIndex.find(str);
+		auto& searchTerm = kp.first;
+		auto pTargetIndex = stringIndex.find(searchTerm);
 		if (pTargetIndex != stringIndex.end())
 		{
 			auto id = pTargetIndex->second;
-			if (str.size() >= 6)
+			if (searchTerm.size() >= 6)
 				longLib.push_back(id);
 			else
 				shortLib.push_back(id);
 			std::vector<size_t> keysMapped;
-			keysMapped.reserve(tempWordMap[str].size());
-			for (auto& key : tempWordMap[str])
+			keysMapped.reserve(tempWordMap[searchTerm].size());
+			for (auto& key : tempWordMap[searchTerm])
 			{
 				auto target = stringIndex.find(key);
 				if (target != stringIndex.end())
@@ -73,7 +73,7 @@ void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector
 			}
 			wordMap[id] = move(keysMapped);
 
-			for (auto& pair : tempWordWeight[str])
+			for (auto& pair : tempWordWeight[searchTerm])
 			{
 				auto target = stringIndex.find(pair.first);
 				if (target != stringIndex.end())
@@ -123,7 +123,7 @@ StringSearch::StringIndex::StringIndex(char** const words, const size_t size, co
 		if (currentWeight != 0.0f)
 		{
 			tempWordMap[upperKey].push_back(strKey);
-			tempWeightMap[strKey][upperKey] = currentWeight;
+			tempWeightMap[upperKey][strKey] = currentWeight;
 		}
 
 		for (size_t j = i + 1; j < i + rowSize; j++)
@@ -140,61 +140,6 @@ StringSearch::StringIndex::StringIndex(char** const words, const size_t size, co
 						currentWeight = weight[j];
 					if (currentWeight != 0.0f)
 					{
-						tempWordMap[strQuery].push_back(strKey);
-						tempWeightMap[strQuery][strKey] = currentWeight;
-					}
-				}
-			}
-	}
-	init(tempWordMap, tempWeightMap);
-	buildGrams();
-}
-
-StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, const uint16_t rowSize, float** weight)
-{
-	if (size < 2)
-		return;
-	std::unordered_map<std::string, std::vector<std::string>> tempWordMap(size);
-	std::unordered_map<std::string, std::unordered_map<std::string, float>> tempWeightMap(size);
-	for (size_t i = 0; i < size; i++)
-	{
-		//skip null entries
-		if (!words[i] || !words[i][0])
-			continue;
-		std::string strKey(words[i][0]);
-		trim(strKey);
-		//skip empty entries
-		if (strKey.size() == 0)
-			continue;
-		std::string upperKey(strKey);
-		escapeBlank(upperKey, validChar);
-		trim(upperKey);
-		toUpper(upperKey);
-
-		float currentWeight = 1.0f;
-		if (weight)
-			currentWeight = weight[i][0];
-		if (currentWeight != 0)
-		{
-			tempWordMap[upperKey].push_back(strKey);
-			tempWeightMap[strKey][upperKey] = currentWeight;
-		}
-
-		for (uint16_t j = 1; j < rowSize; j++)
-			if (words[i][j])
-			{
-				std::string strQuery(words[i][j]);
-				escapeBlank(strQuery, validChar);
-				trim(strQuery);
-				toUpper(strQuery);
-				if (strQuery.size() != 0)
-				{
-					currentWeight = 1.0f;
-					if (weight)
-						currentWeight = weight[i][j];
-					if (currentWeight != 0)
-					{
-						toUpper(strQuery);
 						tempWordMap[strQuery].push_back(strKey);
 						tempWeightMap[strQuery][strKey] = currentWeight;
 					}
@@ -334,9 +279,16 @@ void StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map
 				if (weightPair != weightDicPair->second.end())
 				{
 					auto score = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
-					//the score is considered perfect with a delta of 1E-4
-					if (scorePair.second > 0.99 && stringLib[keyWord] == query)												
-						score = 100;	//On exact match, promote to top
+					//the score is considered perfect greater than 0.999
+					if (scorePair.second > 0.999)
+					{
+						std::string libStr(stringLib[keyWord]);
+						escapeBlank(libStr, validChar);
+						trim(libStr);
+						//On exact match, promote to top
+						if (libStr == query)
+							score = 100;
+					}
 					entryScore[keyWord] = score;
 				}
 			}

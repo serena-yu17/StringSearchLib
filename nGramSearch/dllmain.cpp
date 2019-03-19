@@ -25,27 +25,6 @@ unordered_map<uint32_t, unique_ptr<StringIndex>> indexed;
 
 
 /*!
-Index the library based on a 2D array.
-@param words For each row, the first string is the key to be mapped to, and the second string is the description mapped to the key
-@param size size of the \p words
-@param weight A list of the relative weight of each key. Default 1 for all
-@returns handle to the library
-*/
-DLLEXP uint32_t index2D(char*** const words, const uint64_t size, const uint16_t rowSize, float** const weight)
-{
-	std::unique_lock<shared_mutex> updLock(mainLock);
-	//0 is reserved to represent an empty handle
-	uint32_t handle = 1;
-	const uint32_t maxVal = (numeric_limits<uint32_t>::max)();
-	while (indexed.find(handle) != indexed.end() && handle < maxVal)
-		handle++;
-	if (handle == maxVal)
-		return 0;
-	indexed.emplace(handle, make_unique<StringIndex>(words, (size_t)size, rowSize, weight));
-	return handle;
-}
-
-/*!
 Index the library based on a string array of key, and another array of additional text, e.g. description.
 @param words Words to be searched for. For each row, the first word is used as the master key, in which the row size is \p rowSize.
 All rows are flattened into a 1D-array, and can be extracted based on \p rowSize.

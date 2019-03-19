@@ -114,18 +114,7 @@ namespace StringSearch
 		@param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
 		@param gSize size of grams to be created. Default 3.
 		*/
-		StringIndex(char** const words, const size_t size, const uint16_t rowSize, float* const weight);
-
-		/*!
-		Constructs the StringIndex class by indexing the strings based on an array of words
-		@param words Words to be searched for. For each row, the first word is used as the master key, in which the row size is \p rowSize.
-		Each row is in a separate sub-array. In a search, all queries of the words in a row will return the master key.
-		@param size size of the \p words
-		@param rowSize size of each text rows of \p words.
-		@param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
-		@param gSize size of grams to be created. Default 3.
-		*/
-		StringIndex(char*** const words, const size_t size, const uint16_t rowSize, float** const weight);		
+		StringIndex(char** const words, const size_t size, const uint16_t rowSize, float* const weight);	
 
 		/*!
 		Initiates the word map by assigning the same strings to a pointer, to save space.
@@ -309,7 +298,7 @@ namespace StringSearch
 		//!Allowed words for the query string. Other characters in the ASCII range will be converted to spaces
 		std::unordered_set<char> validChar =
 		{
-			'.','%','$',' ', '@', '-',
+			'.','%','$',' ', '@',
 			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
 			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
