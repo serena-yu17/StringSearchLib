@@ -335,11 +335,8 @@ void StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map
 				{
 					auto score = std::max(weightPair->second * scorePair.second, entryScore[keyWord]);
 					//the score is considered perfect with a delta of 1E-4
-					if (std::abs(scorePair.second - 1) < delta && stringLib[keyWord] == query)
-					{
-						//On exact match, promote to top						
-						score = 100;
-					}
+					if (scorePair.second > 0.99 && stringLib[keyWord] == query)												
+						score = 100;	//On exact match, promote to top
 					entryScore[keyWord] = score;
 				}
 			}
@@ -352,7 +349,7 @@ std::vector<std::pair<size_t, float>> StringSearch::StringIndex::_search(const c
 	std::unordered_map<size_t, float> entryScore;
 
 	//wildcard
-	if (queryStr.size() == 1 && queryStr[0] == '*')
+	if (queryStr.size() == 0 || (queryStr.size() == 1 && queryStr[0] == '*'))
 	{
 		for (auto& kp : wordMap)
 			for (auto& w : kp.second)
