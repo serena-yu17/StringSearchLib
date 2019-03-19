@@ -125,18 +125,7 @@ namespace StringSearch
 		@param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
 		@param gSize size of grams to be created. Default 3.
 		*/
-		StringIndex(char*** const words, const size_t size, const uint16_t rowSize, float** const weight);
-
-		/*!
-		Constructs the StringIndex class by indexing the strings based on an array of words
-		@param words Words to be searched for. For each row, the first word is used as the master key, in which the row size is \p rowSize.
-		Each row is in a separate sub-array. In a search, all queries of the words in a row will return the master key.
-		@param size size of the \p words
-		@param rowSize size of each text rows of \p words.
-		@param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
-		@param gSize size of grams to be created. Default 3.
-		*/
-		StringIndex(std::vector<std::vector<std::string>>& words, std::vector<std::vector<float>>& weight);
+		StringIndex(char*** const words, const size_t size, const uint16_t rowSize, float** const weight);		
 
 		/*!
 		Initiates the word map by assigning the same strings to a pointer, to save space.

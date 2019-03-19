@@ -150,50 +150,6 @@ StringSearch::StringIndex::StringIndex(char** const words, const size_t size, co
 	buildGrams();
 }
 
-StringSearch::StringIndex::StringIndex(std::vector<std::vector<std::string>>& words, std::vector<std::vector<float>>& weight)
-{
-	if (words.size() < 2)
-		return;
-	auto size = words.size();
-	std::unordered_map<std::string, std::vector<std::string>> tempWordMap(size);
-	std::unordered_map<std::string, std::unordered_map<std::string, float>> tempWeightMap(size);
-	for (size_t i = 0; i < words.size(); i++)
-	{
-		auto& row = words[i];
-		std::string strKey(row[0]);
-		trim(strKey);
-
-		if (strKey.size() == 0)
-			continue;
-		std::string upperKey(strKey);
-		toUpper(upperKey);
-
-		float currentWeight = 1.0f;
-		if (weight.size() > i)
-			currentWeight = weight[i][0];
-
-		tempWordMap[upperKey].push_back(strKey);
-		tempWeightMap[strKey][upperKey] = currentWeight;
-
-		for (size_t j = 1; j < row.size(); j++)
-		{
-			std::string strQuery(row[j]);
-			trim(strQuery);
-			if (strQuery.size() != 0)
-			{
-				currentWeight = 1.0f;
-				if (weight.size() > i)
-					currentWeight = weight[i][j];
-				toUpper(strQuery);
-				tempWordMap[strQuery].push_back(strKey);
-				tempWeightMap[strQuery][strKey] = currentWeight;
-			}
-		}
-	}
-	init(tempWordMap, tempWeightMap);
-	buildGrams();
-}
-
 StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, const uint16_t rowSize, float** weight)
 {
 	if (size < 2)
@@ -218,8 +174,11 @@ StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, c
 		float currentWeight = 1.0f;
 		if (weight)
 			currentWeight = weight[i][0];
-		tempWordMap[upperKey].push_back(strKey);
-		tempWeightMap[strKey][upperKey] = currentWeight;
+		if (currentWeight != 0)
+		{
+			tempWordMap[upperKey].push_back(strKey);
+			tempWeightMap[strKey][upperKey] = currentWeight;
+		}
 
 		for (uint16_t j = 1; j < rowSize; j++)
 			if (words[i][j])
@@ -233,9 +192,12 @@ StringSearch::StringIndex::StringIndex(char*** const words, const size_t size, c
 					currentWeight = 1.0f;
 					if (weight)
 						currentWeight = weight[i][j];
-					toUpper(strQuery);
-					tempWordMap[strQuery].push_back(strKey);
-					tempWeightMap[strQuery][strKey] = currentWeight;
+					if (currentWeight != 0)
+					{
+						toUpper(strQuery);
+						tempWordMap[strQuery].push_back(strKey);
+						tempWeightMap[strQuery][strKey] = currentWeight;
+					}
 				}
 			}
 	}
