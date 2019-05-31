@@ -305,8 +305,15 @@ std::vector<std::pair<size_t, float>> StringSearch::StringIndex::_search(const c
 	{
 		for (auto& kp : wordMap)
 			for (auto& w : kp.second)
-				if (wordWeight.find(w) != wordWeight.end() && wordWeight.find(w)->second.find(w) != wordWeight.find(w)->second.end())
-					entryScore[w] = wordWeight.find(w)->second.find(w)->second;
+			{
+				auto found1 = wordWeight.find(kp.first);
+				if (found1 != wordWeight.end()) {
+					auto weightSet = found1->second;
+					auto weightFound = weightSet.find(w);
+					if (weightFound != weightSet.end())
+						entryScore[w] = weightFound->second;
+				}
+			}
 	}
 	else
 	{
