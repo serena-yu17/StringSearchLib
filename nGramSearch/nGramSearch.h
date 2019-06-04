@@ -165,7 +165,7 @@ namespace StringSearch
 		@param targets The target strings that have been scored
 		@param currentScore The score for each strings in \p targets
 		*/
-		void getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets, std::vector<float>& currentScore) const;
+		void getMatchScore(const std::string& query, std::unordered_map<size_t, float>& score) const;
 
 		/*!
 		Search in the shortLib
@@ -284,9 +284,6 @@ namespace StringSearch
 		//! The n-gram library generated
 		std::unordered_map<int32_t, std::unordered_set<size_t>> ngrams;
 
-		//! The section size of strings for each \p getMatchScore loop block
-		size_t sectionSizeShort = 1000;
-		size_t sectionSizeLong = 1000;
 		size_t longest = 0;
 
 		//! Indicator of whether the library has been indexed. If not indexed, no search can be done.

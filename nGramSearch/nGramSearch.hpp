@@ -85,15 +85,6 @@ void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector
 	stringLib.shrink_to_fit();
 	longLib.shrink_to_fit();
 	shortLib.shrink_to_fit();
-
-	//Each future involves an overhead of about 1-2 us, so I am limiting the number of futures to hardware concurrency
-	auto nThrd = std::thread::hardware_concurrency();
-	size_t sizeNeededShort = (size_t)ceil((float)shortLib.size() / nThrd);
-	if (sizeNeededShort > sectionSizeShort)
-		sectionSizeShort = sizeNeededShort;
-	size_t sizeNeededLong = (size_t)ceil((float)longLib.size() / nThrd);
-	if (sizeNeededLong > sectionSizeLong)
-		sectionSizeLong = sizeNeededLong;
 }
 
 StringSearch::StringIndex::StringIndex(char** const words, const size_t size, const uint16_t rowSize, float* const weight)
@@ -165,7 +156,7 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 	size_t sSize = source.size();
 	auto maxSize = std::max(qSize, sSize);
 
-	fill(row1.begin(), row1.end(), 0);
+	std::fill(row1.begin(), row1.end(), 0);
 	for (size_t q = 0; q < qSize; q++)
 	{
 		row2[0] = q + 1;
@@ -192,8 +183,7 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 	return qSize - misMatch;
 }
 
-void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t first, std::vector<size_t>& targets,
-	std::vector<float>& currentScore) const
+void StringSearch::StringIndex::getMatchScore(const std::string& query, std::unordered_map<size_t, float>& score) const
 {
 	auto size = std::max(query.size() + 1, (size_t)6);
 	if (query.size() <= 3)
@@ -201,21 +191,19 @@ void StringSearch::StringIndex::getMatchScore(const std::string& query, size_t f
 	//allocate levenstein temporary containers
 	std::vector<size_t> row1(size);
 	std::vector<size_t> row2(size);
-	for (size_t i = first * sectionSizeShort; i < first * sectionSizeShort + sectionSizeShort && i < shortLib.size(); i++)
+	for (size_t i = 0; i < shortLib.size(); i++)
 	{
 		auto& source = shortLib[i];
 		auto match = stringMatch(query, stringLib[source], row1, row2);
-		currentScore[i] = (float)match / query.size();
-		targets[i] = source;
+		score[source] += (float)match / query.size();
 	}
 	//search for all strings if n-gram does not work
 	if (query.size() <= 3)
-		for (size_t i = first * sectionSizeLong; i < first * sectionSizeLong + sectionSizeLong && i < longLib.size(); i++)
+		for (size_t i = 0; i < longLib.size(); i++)
 		{
 			auto& source = longLib[i];
 			auto match = stringMatch(query, stringLib[source], row1, row2);
-			currentScore[i + shortLib.size()] = (float)match / query.size();
-			targets[i + shortLib.size()] = source;
+			score[source] += (float)match / query.size();
 		}
 }
 
@@ -225,16 +213,8 @@ void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_m
 	auto dicSize = shortLib.size();
 	if (query.size() <= 3)
 		dicSize += longLib.size();
-	std::vector<size_t> targets(dicSize);
-	std::vector<float> currentScore(dicSize);
-	std::vector<std::future<void>> futures;
-	auto nThrd = std::thread::hardware_concurrency();
-	for (size_t section = 0; section < nThrd; section++)
-		futures.emplace_back(std::async(std::launch::async, &StringIndex::getMatchScore, this, std::cref(query), section, std::ref(targets), std::ref(currentScore)));
-	for (auto& fu : futures)
-		fu.get();
-	for (size_t i = 0; i < dicSize; i++)
-		score[targets[i]] += currentScore[i];
+
+	getMatchScore(query, score);
 }
 
 void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_map<size_t, float>& score) const
