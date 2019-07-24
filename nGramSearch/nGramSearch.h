@@ -181,6 +181,13 @@ namespace StringSearch
 		*/
 		void searchLong(std::string& query, std::unordered_map<size_t, float>& score) const;
 
+		/*!
+		Assigns scores to the corresponding keywords
+		@param query The query string.
+		@param entryScore The result calculated will be merged to this map based on keywords. Key: the keyword's ID, Value: the score
+		@param scoreList The score board to be processed. Key: the word's ID, Value: the score
+		@param threshold Scores lower than this threshold will be discarded
+		*/
 		void calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore, std::unordered_map<size_t, float>& scoreList, const float threshold) const;
 
 		/*!
@@ -213,7 +220,7 @@ namespace StringSearch
 		uint32_t score(const char* query, char*** results, float** scores, const float threshold, uint32_t limit) const;
 
 		/*!
-		Release a result pointer that have been generated in \p search
+		Releases a result pointer that have been generated in \p search
 		@param results The strings allocated using the \p new operator.
 		@param scores The scores allocated using the \p new operator.
 		*/
@@ -262,6 +269,10 @@ namespace StringSearch
 			}
 		};
 
+		/*!
+		Allows the caller to adjust the validChar set
+		@param newValidChar The new validChar set to use 
+		*/
 		void setValidChar(std::unordered_set<char>& newValidChar);
 
 	private:

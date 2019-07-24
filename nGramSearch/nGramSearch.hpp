@@ -5,6 +5,11 @@
 
 #include "nGramSearch.h"
 
+
+/*!
+Generate n-grams from a string based on the member variable \p gramSize.
+@param str A pointer to the string to generate n-grams from.
+*/
 void StringSearch::StringIndex::getGrams(size_t id)
 {
 	auto& str = stringLib[id];
@@ -15,6 +20,12 @@ void StringSearch::StringIndex::getGrams(size_t id)
 	}
 }
 
+
+/*!
+Generate n-grams from a string based on the member variable \p gramSize, and store in an array.
+@param str A pointer to the string to generate n-grams from.
+@param generatedGrams A vector to store the genearated n-grams
+*/
 std::vector<int32_t> StringSearch::StringIndex::getGrams(const std::string& str) const
 {
 	std::vector<int32_t> generatedGrams;
@@ -24,6 +35,9 @@ std::vector<int32_t> StringSearch::StringIndex::getGrams(const std::string& str)
 	return generatedGrams;
 }
 
+/*!
+Build n-grams for the member variable \p longLib
+*/
 void StringSearch::StringIndex::buildGrams()
 {
 	for (auto& id : longLib)
@@ -31,6 +45,12 @@ void StringSearch::StringIndex::buildGrams()
 	indexed = true;
 }
 
+
+/*!
+Initiates the word map by assigning the same strings to a pointer, to save space.
+@param tempWordMap A temprary word map of strings.
+Key: query terms. Value: a list of master keys and corresponding scores that the queries point to.
+*/
 void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector<std::string>>& tempWordMap,
 	std::unordered_map<std::string, std::unordered_map<std::string, float>>& tempWordWeight)
 {
@@ -87,6 +107,16 @@ void StringSearch::StringIndex::init(std::unordered_map<std::string, std::vector
 	shortLib.shrink_to_fit();
 }
 
+/*!
+Constructs the StringIndex class by indexing the strings based on an array of words
+@param words Words to be searched for. For each row, the first word is used as the master key, in which the row size is \p rowSize.
+All rows are flattened into a 1D-array, and can be extracted based on \p rowSize.
+In a search, all queries of the words in a row will return the master key.
+@param size size of the \p words
+@param rowSize size of each text rows of \p words.
+@param weight A list of weight values for each key. It should be at least as long as the number of rows, i.e. \p size / \p rowSize.
+@param gSize size of grams to be created. Default 3.
+*/
 StringSearch::StringIndex::StringIndex(char** const words, const size_t size, const uint16_t rowSize, float* const weight)
 {
 	if (size < 2 || !words)
@@ -141,6 +171,14 @@ StringSearch::StringIndex::StringIndex(char** const words, const size_t size, co
 	buildGrams();
 }
 
+
+/*!
+Computes the percentage of \p query matches \p source.
+@param query A query string
+@param source A source string in the library to compare to.
+@param row1 A temporary vector as a cache for the algorithm. Its size must at least (the max size of \p query and \p source) + 1.
+@param row2 A temporary vector as a cache for the algorithm. Its size must at least (the max size of \p query and \p source) + 1.
+*/
 size_t StringSearch::StringIndex::stringMatch(const std::string& query, const std::string& source,
 	std::vector<size_t>& row1, std::vector<size_t>& row2) const
 {
@@ -183,6 +221,14 @@ size_t StringSearch::StringIndex::stringMatch(const std::string& query, const st
 	return qSize - misMatch;
 }
 
+
+/*!
+A looper to calculate match scores
+@param query The query string.
+@param first The starting index to loop from.
+@param targets The target strings that have been scored
+@param currentScore The score for each strings in \p targets
+*/
 void StringSearch::StringIndex::getMatchScore(const std::string& query, std::unordered_map<size_t, float>& score) const
 {
 	auto size = std::max(query.size() + 1, (size_t)6);
@@ -207,6 +253,12 @@ void StringSearch::StringIndex::getMatchScore(const std::string& query, std::uno
 		}
 }
 
+
+/*!
+Search in the shortLib
+@param query The query string.
+@param score Targets found paired with their corresponding cores generated.
+*/
 void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_map<size_t, float>& score) const
 {
 	auto len = query.size();
@@ -217,6 +269,12 @@ void StringSearch::StringIndex::searchShort(std::string& query, std::unordered_m
 	getMatchScore(query, score);
 }
 
+
+/*!
+Search in the longLib
+@param query The query string.
+@param score Targets found paired with their corresponding cores generated.
+*/
 void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_map<size_t, float>& score) const
 {
 	auto len = query.size();
@@ -242,6 +300,13 @@ void StringSearch::StringIndex::searchLong(std::string& query, std::unordered_ma
 		score[kp.first] = (float)kp.second / generatedGrams.size();
 }
 
+/*!
+Assigns scores to the corresponding keywords
+@param query The query string.
+@param entryScore The result calculated will be merged to this map based on keywords. Key: the keyword's ID, Value: the score
+@param scoreList The score board to be processed. Key: the word's ID, Value: the score
+@param threshold Scores lower than this threshold will be discarded
+*/
 void StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map<size_t, float>& entryScore,
 	std::unordered_map<size_t, float>& scoreList, const float threshold) const
 {
@@ -275,6 +340,13 @@ void StringSearch::StringIndex::calcScore(std::string& query, std::unordered_map
 	}
 }
 
+/*!
+The worker function for search
+@param query The query string.
+@param threshold Lowest acceptable match ratio for a string to be included in the results.
+@param limit The maximum number of results to generate.
+@param result The matching strings to be selected, sorted from highest score to lowest.
+*/
 std::vector<std::pair<size_t, float>> StringSearch::StringIndex::_search(const char* query, const float threshold, const uint32_t limit) const
 {
 	std::string queryStr(query);
@@ -331,6 +403,15 @@ std::vector<std::pair<size_t, float>> StringSearch::StringIndex::_search(const c
 	return scoreElems;
 }
 
+
+/*!
+The search interface function, calls \p _search
+@param query The query string.
+@param results The matching strings to be selected, sorted from highest score to lowest.
+@param size The number of strings in the result array.
+@param threshold Lowest acceptable match ratio for a string to be included in the results.
+@param limit The maximum number of results to generate.
+*/
 uint32_t StringSearch::StringIndex::score(const char* query, char*** results, float** scores, const float threshold, uint32_t limit) const
 {
 	if (!indexed)
@@ -356,6 +437,15 @@ uint32_t StringSearch::StringIndex::score(const char* query, char*** results, fl
 	return size;
 }
 
+
+/*!
+The search interface function, calls \p _search
+@param query The query string.
+@param results The matching strings to be selected, sorted from highest score to lowest.
+@param size The number of strings in the result array.
+@param threshold Lowest acceptable match ratio for a string to be included in the results.
+@param limit The maximum number of results to generate.
+*/
 uint32_t StringSearch::StringIndex::search(const char* query, char*** results, const float threshold, uint32_t limit) const
 {
 	if (!indexed)
@@ -379,6 +469,11 @@ uint32_t StringSearch::StringIndex::search(const char* query, char*** results, c
 	return size;
 }
 
+/*!
+Releases a result pointer that have been generated in \p search
+@param results The strings allocated using the \p new operator.
+@param scores The scores allocated using the \p new operator.
+*/
 void StringSearch::StringIndex::release(char** results, float* scores) const
 {
 	if (results)
@@ -387,16 +482,26 @@ void StringSearch::StringIndex::release(char** results, float* scores) const
 		delete[] scores;
 }
 
+/*!
+Get the size of the word map \p wordMap
+*/
 uint64_t StringSearch::StringIndex::size() const
 {
 	return wordMap.size();
 }
 
+/*!
+Get the size of the n-gram library \p ngrams
+*/
 uint64_t StringSearch::StringIndex::libSize() const
 {
 	return ngrams.size();
 }
 
+/*!
+Allows the caller to adjust the validChar set
+@param newValidChar The new validChar set to use
+*/
 void StringSearch::StringIndex::setValidChar(std::unordered_set<char>& newValidChar)
 {
 	validChar = std::move(newValidChar);
